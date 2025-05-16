@@ -38,7 +38,7 @@ export default function NavBar() {
         </div>
 
         {/* Nav Links */}
-        <div className="hidden md:flex gap-10 tracking-wider font-open-sans text-lg">
+        <div className="hidden md:flex gap-10 tracking-wider font-roboto text-lg font-normal">
           <NavLinkItem to="/textSentiment" label="Text Analyzer" activePath={location.pathname} />
           <NavLinkItem to="/productSentiment" label="Product Reviews" activePath={location.pathname} />
           <NavLinkItem to="/socialSentiment" label="Social Media" activePath={location.pathname} />

@@ -19,9 +19,6 @@ export default function MobileMenu({ isOpen, setIsOpen }) {
         <Link to="/socialSentiment" onClick={() => setIsOpen(false)} className="block hover:underline">
           Social Media
         </Link>
-        <Link to="/userProfile" onClick={() => setIsOpen(false)} className="block hover:underline">
-          Profile
-        </Link>
       </div>
     </div>
   );
