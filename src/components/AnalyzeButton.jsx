@@ -1,12 +1,13 @@
+// src/components/AnalyzeButton.jsx
 import { BsFillLightningChargeFill } from "react-icons/bs";
 
-export default function AnalyzeButton({ onClick }) {
+export default function AnalyzeButton({ onClick, className }) {
   return (
     <button
-      className="flex items-center gap-1 border rounded px-3 py-1 text-sm font-medium shadow-sm hover:bg-blue-100 dark:hover:bg-blue-900 transition-colors"
       onClick={onClick}
+      className={`flex items-center gap-2 h-10 px-4 rounded-md font-semibold text-lg tracking-wider border border-black dark:border-white bg-white dark:bg-black text-black dark:text-white hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors ${className}`}
     >
-      <BsFillLightningChargeFill className="text-yellow-500" />
+      <BsFillLightningChargeFill className="text-blue-500 size-5" />
       Analyze Text
     </button>
   );
