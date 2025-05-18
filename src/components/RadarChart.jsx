@@ -37,14 +37,14 @@ export function RadarChart({
 }) {
   const isDark = typeof window !== 'undefined'
     && document.documentElement.classList.contains('dark')
-  const skeletonBg = isDark ? '#23272e' : '#eee'
+  const skeletonBg = isDark ? '#444' : '#eee'
 
   if (loading) {
     return (
       <Card data-chart={id} className={className}>
         <CardHeader className="space-y-2">
-          <Skeleton className="w-48 h-6" />
-          <Skeleton className="w-32 h-4" />
+          <CardTitle>{title}</CardTitle>
+          {description && <CardDescription>{description}</CardDescription>}
         </CardHeader>
         <CardContent className="flex justify-center p-6">
           <Skeleton

@@ -23,7 +23,7 @@ export function GaugeMeter({
     return (
       <Card data-chart={id} className="bg-white dark:bg-transparent">
         <CardHeader className="items-center">
-          <Skeleton className="w-48 h-8" />
+          <CardTitle className="text-xl font-semibold">Sentiment Score</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col items-center justify-center p-6">
           <Skeleton className="w-[260px] h-[130px] rounded-full" />

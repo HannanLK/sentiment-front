@@ -34,11 +34,17 @@ export function PieChart({
 }) {
   const isDark = typeof window !== 'undefined'
     && document.documentElement.classList.contains('dark')
-  const skeletonBg = isDark ? '#23272e' : '#eee'
+  const skeletonBg = isDark ? '#444' : '#eee'
 
   if (loading) {
     return (
       <Card data-chart={id} className={className}>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <div className="grid gap-1">
+            <CardTitle>{title}</CardTitle>
+            {description && <CardDescription>{description}</CardDescription>}
+          </div>
+        </CardHeader>
         <CardContent className="flex justify-center p-6">
           <Skeleton
             className="w-[320px] h-[320px] rounded-full"

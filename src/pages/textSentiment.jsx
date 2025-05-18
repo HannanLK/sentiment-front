@@ -10,6 +10,7 @@ import { PieChart } from "../components/PieChart"
 import { RadarChart } from "../components/RadarChart"
 import { Card, CardHeader, CardTitle, CardContent } from "../components/ui/card"
 import { ModelConfidence } from "../components/ModelConfidence"
+import { FaRegTrashAlt } from "react-icons/fa"
 
 // Simple Error Boundary Component
 class ErrorBoundary extends React.Component {
@@ -103,7 +104,7 @@ export default function TextSentiment() {
             value={text}
             onChange={(e) => setText(e.target.value)}
             placeholder="Type or paste something…"
-            className="w-full h-48 bg-transparent text-gray-800 dark:text-white p-4 focus:outline-none dark:bg-[#161616dc]"
+            className="w-full h-48 bg-transparent font-roboto text-lg text-gray-800 dark:text-white p-4 focus:outline-none dark:bg-[#161616dc]"
           />
           <div className="flex justify-between items-center border-t border-gray-200 dark:border-zinc-700 bg-gray-100 dark:bg-[#232323e2] p-3 rounded-b-lg">
             <FileUploadToggle onFileSelect={(f) => {
@@ -126,17 +127,7 @@ export default function TextSentiment() {
                 className="h-8 w-8 flex items-center justify-center text-black dark:text-white hover:bg-gray-100 dark:hover:bg-zinc-800 rounded"
                 title="Clear text"
               >
-                {/* your trash icon */}
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none" viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  className="w-5 h-5"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M10 7V4h4v3"
-                  />
-                </svg>
+                <FaRegTrashAlt className="w-5 h-5" />
               </button>
             </div>
           </div>
@@ -166,7 +157,7 @@ export default function TextSentiment() {
             <ErrorBoundary>
               <Card className="bg-white dark:bg-transparent">
                 <CardHeader>
-                  <CardTitle className="text-xl font-semibold">Confidence Level :</CardTitle>
+                  <CardTitle className="text-xl font-semibold">Confidence Level</CardTitle>
                 </CardHeader>
                 <CardContent className="p-6 pt-2">
                   <div className="w-full mx-auto">
