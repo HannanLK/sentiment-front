@@ -147,101 +147,105 @@ export default function TextSentiment() {
       </div>
 
       {/* Results Section */}
-      {result && (
-        <section className={`w-4/5 mx-auto py-8 transition-opacity duration-500 ease-in-out ${chartsReady ? 'opacity-100' : 'opacity-0'}`}>
-          {/* Main two-column layout */}
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 items-start">
-            {/* Left Column: Sentiment Score and Confidence Level */}
-            <div className="grid grid-cols-1 gap-6">
-              {/* Top Left: Gauge Meter */}
-              <ErrorBoundary>
-                <GaugeMeter
-                  id="text-gauge"
-                  score={result.score}
-                  loading={loading}
-                  className="bg-white dark:bg-[#161616]"
-                />
-              </ErrorBoundary>
+      <section className="w-4/5 mx-auto py-8">
+        {/* Main two-column layout */}
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 items-start">
+          {/* Left Column: Sentiment Score and Confidence Level */}
+          <div className="grid grid-cols-1 gap-6">
+            {/* Top Left: Gauge Meter */}
+            <ErrorBoundary>
+              <GaugeMeter
+                id="text-gauge"
+                score={result?.score}
+                loading={!result}
+                className="bg-white dark:bg-[#161616]"
+              />
+            </ErrorBoundary>
 
-              {/* Bottom Left: Confidence Level */}
-              {result.confidence !== null && (
-                <ErrorBoundary>
-                  <Card className="bg-white dark:bg-transparent">
-                    <CardHeader>
-                      <CardTitle className="text-xl font-semibold">Confidence Level :</CardTitle>
-                    </CardHeader>
-                    <CardContent className="p-6 pt-2">
-                      <div className="w-full mx-auto">
+            {/* Bottom Left: Confidence Level */}
+            <ErrorBoundary>
+              <Card className="bg-white dark:bg-transparent">
+                <CardHeader>
+                  <CardTitle className="text-xl font-semibold">Confidence Level :</CardTitle>
+                </CardHeader>
+                <CardContent className="p-6 pt-2">
+                  <div className="w-full mx-auto">
+                    {!result ? (
+                      <div className="w-full h-3 rounded-full overflow-hidden bg-gray-300 dark:bg-[#444]">
+                        <div className="h-full bg-gray-200 dark:bg-[#666] animate-pulse" />
+                      </div>
+                    ) : (
+                      <>
                         <div className="w-full h-3 rounded-full overflow-hidden bg-gray-300 dark:bg-[#444]">
                           <div className="h-full bg-blue-500" style={{ width: `${Math.round(result.confidence * 100)}%` }} />
                         </div>
                         <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 text-center">{Math.round(result.confidence * 100)}%</div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </ErrorBoundary>
-              )}
-            </div>
-
-            {/* Right Column: Emotions Breakdown Chart */}
-            <div className="space-y-6">
-              <Card className="bg-white dark:bg-transparent">
-                <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-                  <CardTitle className="text-xl font-semibold">
-                    Emotions Breakdown
-                  </CardTitle>
-                  <div className="relative">
-                    <select value={chartType} onChange={(e) => setChartType(e.target.value)} className="appearance-none bg-white dark:bg-[#161616] border border-gray-300 dark:border-zinc-700 rounded-md py-1 pl-2 pr-8 text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 cursor-pointer">
-                      <option value="pie">Pie Chart</option>
-                      <option value="radar">Radar Chart</option>
-                    </select>
-                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700 dark:text-gray-300">
-                      <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="p-6 pt-2">
-                  <ErrorBoundary>
-                    {chartType === 'pie' ? (
-                      <PieChart
-                        id="text-pie"
-                        title=""
-                        description="Positive / Neutral / Negative"
-                        data={result.distribution && Object.entries(result.distribution).map(
-                          ([name, value]) => ({ name, value })
-                        )}
-                        config={{
-                          Positive: { label: "Positive", color: "hsl(142 71% 45%)" }, // Green
-                          Neutral:  { label: "Neutral",  color: "hsl(48 96% 45%)" },  // Yellow
-                          Negative: { label: "Negative", color: "hsl(0 84% 60%)" }, // Red
-                        }}
-                        loading={loading}
-                        className="bg-white dark:bg-[#161616]"
-                      />
-                    ) : (
-                      <RadarChart
-                        id="text-radar"
-                        title=""
-                        description="Positive / Neutral / Negative"
-                        data={result.radar}
-                        angleKey="sentiment"
-                        dataKey="count"
-                        config={{
-                          Positive: { label: "Positive", color: "hsl(220 70% 50%)" }, // Blue
-                          Neutral:  { label: "Neutral",  color: "hsl(48 96% 45%)" }, // Yellow
-                          Negative: { label: "Negative", color: "hsl(0 84% 60%)" }, // Red
-                        }}
-                        loading={loading}
-                        className="bg-white dark:bg-[#161616] pb-0"
-                      />
+                      </>
                     )}
-                  </ErrorBoundary>
+                  </div>
                 </CardContent>
               </Card>
-            </div>
+            </ErrorBoundary>
           </div>
-        </section>
-      )}
+
+          {/* Right Column: Emotions Breakdown Chart */}
+          <div className="space-y-6">
+            <Card className="bg-white dark:bg-transparent">
+              <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+                <CardTitle className="text-xl font-semibold">
+                  Emotions Breakdown
+                </CardTitle>
+                <div className="relative">
+                  <select value={chartType} onChange={(e) => setChartType(e.target.value)} className="appearance-none bg-white dark:bg-[#161616] border border-gray-300 dark:border-zinc-700 rounded-md py-1 pl-2 pr-8 text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 cursor-pointer">
+                    <option value="pie">Pie Chart</option>
+                    <option value="radar">Radar Chart</option>
+                  </select>
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700 dark:text-gray-300">
+                    <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="p-6 pt-2">
+                <ErrorBoundary>
+                  {chartType === 'pie' ? (
+                    <PieChart
+                      id="text-pie"
+                      title=""
+                      description="Positive / Neutral / Negative"
+                      data={result?.distribution && Object.entries(result.distribution).map(
+                        ([name, value]) => ({ name, value })
+                      )}
+                      config={{
+                        Positive: { label: "Positive", color: "hsl(142 71% 45%)" }, // Green
+                        Neutral:  { label: "Neutral",  color: "hsl(48 96% 45%)" },  // Yellow
+                        Negative: { label: "Negative", color: "hsl(0 84% 60%)" }, // Red
+                      }}
+                      loading={!result}
+                      className="bg-white dark:bg-[#161616]"
+                    />
+                  ) : (
+                    <RadarChart
+                      id="text-radar"
+                      title=""
+                      description="Positive / Neutral / Negative"
+                      data={result?.radar}
+                      angleKey="sentiment"
+                      dataKey="count"
+                      config={{
+                        Positive: { label: "Positive", color: "hsl(220 70% 50%)" }, // Blue
+                        Neutral:  { label: "Neutral",  color: "hsl(48 96% 45%)" }, // Yellow
+                        Negative: { label: "Negative", color: "hsl(0 84% 60%)" }, // Red
+                      }}
+                      loading={!result}
+                      className="bg-white dark:bg-[#161616] pb-0"
+                    />
+                  )}
+                </ErrorBoundary>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
     </div>
   )
 }
