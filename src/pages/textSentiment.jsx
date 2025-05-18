@@ -190,7 +190,7 @@ export default function TextSentiment() {
 
           {/* Right Column: Emotions Breakdown Chart */}
           <div className="space-y-6">
-            <Card className="bg-white dark:bg-transparent">
+            <Card className="bg-white dark:bg-transparent border-0 shadow-none">
               <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
                 <CardTitle className="text-xl font-semibold">
                   Emotions Breakdown
@@ -221,7 +221,7 @@ export default function TextSentiment() {
                         Negative: { label: "Negative", color: "hsl(0 84% 60%)" }, // Red
                       }}
                       loading={!result}
-                      className="bg-white dark:bg-[#161616]"
+                      className="bg-white dark:bg-transparent"
                     />
                   ) : (
                     <RadarChart
@@ -237,7 +237,7 @@ export default function TextSentiment() {
                         Negative: { label: "Negative", color: "hsl(0 84% 60%)" }, // Red
                       }}
                       loading={!result}
-                      className="bg-white dark:bg-[#161616] pb-0"
+                      className="bg-white dark:bg-transparent pb-0"
                     />
                   )}
                 </ErrorBoundary>
