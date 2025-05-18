@@ -9,19 +9,19 @@ export function GaugeMeter({
   score,
   max = 100,
   color = "hsl(var(--chart-1))",
-  size = 340, // increased size
+  size = 380, // Further increased size to match chart card
   loading = false,
   confidence = null, // for optional confidence bar
 }) {
   // For the arc, recharts draws from 180 to 0 (semi-circle)
   // We'll use SVG for custom drawing
   const isDark = typeof window !== 'undefined' && document.documentElement.classList.contains('dark');
-  const bgColor = isDark ? '#23272e' : '#eee';
+  const bgColor = isDark ? '#eee' : '#eee'; // Match dark mode background of confidence bar
   const progressBg = isDark ? '#444' : '#eee';
 
   if (loading) {
     return (
-      <Card data-chart={id}>
+      <Card data-chart={id} className="bg-white dark:bg-transparent">
         <CardHeader className="items-center">
           <Skeleton className="w-48 h-8" />
         </CardHeader>
@@ -35,7 +35,7 @@ export function GaugeMeter({
   }
 
   return (
-    <Card data-chart={id}>
+    <Card data-chart={id} className="bg-white dark:bg-transparent">
       <CardHeader className="items-center">
         <CardTitle className="text-xl font-semibold">Sentiment Score</CardTitle>
       </CardHeader>

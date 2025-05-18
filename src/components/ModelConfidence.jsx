@@ -34,7 +34,7 @@ export function ModelConfidence({ confidence = 0, loading = false }) {
   }
 
   return (
-    <Card>
+    <Card className="bg-white dark:bg-[#161616]">
       <CardHeader>
         <CardTitle>Confidence Level</CardTitle>
       </CardHeader>

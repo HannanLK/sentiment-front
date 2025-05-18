@@ -50,7 +50,7 @@ export function PieChart({
   }
 
   return (
-    <Card data-chart={id} className={className}>
+    <Card data-chart={id} className={`bg-white dark:bg-[#161616] ${className}`}>
       <ChartStyle id={id} config={config} />
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <div className="grid gap-1">
@@ -58,7 +58,7 @@ export function PieChart({
           {description && <CardDescription>{description}</CardDescription>}
         </div>
       </CardHeader>
-      <CardContent className="flex justify-center p-6 pt-0">
+      <CardContent className="flex justify-center p-0">
         <ChartContainer
           id={id}
           config={config}
