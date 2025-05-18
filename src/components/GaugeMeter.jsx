@@ -36,7 +36,7 @@ export function GaugeMeter({
 
   return (
     <Card data-chart={id}>
-      <CardHeader className="items-center p-2 pb-0">
+      <CardHeader className="items-center">
         <CardTitle className="text-xl font-semibold">Sentiment Score</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col items-center justify-center p-6 pt-2">
@@ -50,7 +50,7 @@ export function GaugeMeter({
             <text x={30} y={size/2} fontSize="18" fill="#888">0</text>
             <text x={size-30} y={size/2} fontSize="18" fill="#888" textAnchor="end">100</text>
             {/* Score in center */}
-            <text x={size/2} y={size/2-30} fontSize="48" fill="#222" textAnchor="middle" alignmentBaseline="middle" fontWeight="bold">{score}</text>
+            <text x={size/2} y={size/2 - 30} fontSize="48" fill="#222" textAnchor="middle" alignmentBaseline="middle" fontWeight="bold">{score}</text>
           </svg>
           {/* Confidence bar below gauge */}
           {confidence !== null && (

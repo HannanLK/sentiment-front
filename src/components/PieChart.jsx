@@ -14,6 +14,8 @@ import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
+  ChartLegend,
+  ChartLegendContent,
 } from "./ui/chart"
 import { Skeleton } from "./ui/skeleton"
 
@@ -50,11 +52,13 @@ export function PieChart({
   return (
     <Card data-chart={id} className={className}>
       <ChartStyle id={id} config={config} />
-      <CardHeader>
-        <CardTitle>{title}</CardTitle>
-        {description && <CardDescription>{description}</CardDescription>}
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <div className="grid gap-1">
+          <CardTitle>{title}</CardTitle>
+          {description && <CardDescription>{description}</CardDescription>}
+        </div>
       </CardHeader>
-      <CardContent className="flex justify-center p-6">
+      <CardContent className="flex justify-center p-6 pt-0">
         <ChartContainer
           id={id}
           config={config}
@@ -80,6 +84,9 @@ export function PieChart({
                 />
               ))}
             </Pie>
+            <ChartLegend
+              content={<ChartLegendContent />}
+            />
           </RePieChart>
         </ChartContainer>
       </CardContent>
