@@ -6,44 +6,28 @@ import { Textarea } from "./ui/textarea";
 import { useToast } from "./ui/use-toast";
 import { api } from "@/lib/api";
 import { Loader2, Copy, Download } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
 
 const styleOptions = [
-  {
-    value: "formal",
-    label: "Formal",
-    description: "Professional and formal language suitable for business documents"
-  },
-  {
-    value: "casual",
-    label: "Casual",
-    description: "Relaxed and conversational tone for informal communication"
-  },
-  {
-    value: "professional",
-    label: "Professional",
-    description: "Business-appropriate language with a professional touch"
-  },
-  {
-    value: "marketing",
-    label: "Marketing",
-    description: "Engaging and persuasive language for marketing materials"
-  },
-  {
-    value: "technical",
-    label: "Technical",
-    description: "Detailed and precise language for technical documentation"
-  },
-  {
-    value: "simplified",
-    label: "Simplified",
-    description: "Clear and simple language for easy understanding"
-  }
+  { value: 'funny', label: 'Funny and Humorous' },
+  { value: 'emotional', label: 'Emotional and Passionate' },
+  { value: 'storytelling', label: 'Storytelling' },
+  { value: 'professional', label: 'Professional' },
+  { value: 'technical', label: 'Technical' },
+  { value: 'casual', label: 'Casual' },
+  { value: 'informal', label: 'Informal' }
 ];
 
 export function TextStyleEnhancement({ originalText }) {
   const [selectedStyle, setSelectedStyle] = useState("");
   const [enhancedText, setEnhancedText] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const { toast } = useToast();
 
   const handleEnhance = async () => {
@@ -66,21 +50,30 @@ export function TextStyleEnhancement({ originalText }) {
     }
 
     setLoading(true);
+    setError(null);
     try {
       const response = await api.post("/text/enhance", {
         text: originalText,
         style: selectedStyle
       });
-      setEnhancedText(response.data.enhanced_text);
-      toast({
-        title: "Success",
-        description: "Text enhanced successfully"
-      });
+      
+      if (response.data && response.data.enhanced_text) {
+        setEnhancedText(response.data.enhanced_text);
+        toast({
+          title: "Success",
+          description: "Text enhanced successfully"
+        });
+      } else {
+        console.error("Invalid response format:", response.data);
+        throw new Error("Invalid response from server");
+      }
     } catch (error) {
       console.error("Error enhancing text:", error);
+      const errorMessage = error.response?.data?.detail || error.message || "Failed to enhance text. Please try again.";
+      setError(errorMessage);
       toast({
         title: "Error",
-        description: error.response?.data?.detail || "Failed to enhance text. Please try again.",
+        description: errorMessage,
         variant: "destructive"
       });
     } finally {
@@ -89,6 +82,8 @@ export function TextStyleEnhancement({ originalText }) {
   };
 
   const handleCopy = () => {
+    if (!enhancedText) return;
+    
     navigator.clipboard.writeText(enhancedText);
     toast({
       title: "Success",
@@ -96,27 +91,65 @@ export function TextStyleEnhancement({ originalText }) {
     });
   };
 
-  const handleDownload = () => {
-    const blob = new Blob([enhancedText], { type: "text/plain" });
+  const handleDownload = (format) => {
+    if (!enhancedText) return;
+
+    let blob;
+    let filename;
+    let mimeType;
+
+    switch (format) {
+      case 'txt':
+        blob = new Blob([enhancedText], { type: 'text/plain' });
+        filename = 'enhanced-text.txt';
+        mimeType = 'text/plain';
+        break;
+      case 'csv':
+        const csvContent = `Original Text,Enhanced Text\n"${originalText}","${enhancedText}"`;
+        blob = new Blob([csvContent], { type: 'text/csv' });
+        filename = 'enhanced-text.csv';
+        mimeType = 'text/csv';
+        break;
+      case 'docx':
+        const htmlContent = `
+          <html>
+            <head>
+              <meta charset="UTF-8">
+              <title>Enhanced Text</title>
+            </head>
+            <body>
+              <h2>Original Text:</h2>
+              <p>${originalText}</p>
+              <h2>Enhanced Text:</h2>
+              <p>${enhancedText}</p>
+            </body>
+          </html>
+        `;
+        blob = new Blob([htmlContent], { type: 'application/msword' });
+        filename = 'enhanced-text.doc';
+        mimeType = 'application/msword';
+        break;
+      default:
+        return;
+    }
+
     const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
+    const a = document.createElement('a');
     a.href = url;
-    a.download = "enhanced-text.txt";
+    a.download = filename;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
   };
 
-  const selectedStyleInfo = styleOptions.find(style => style.value === selectedStyle);
-
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <CardTitle>Text Enhancement</CardTitle>
+    <Card className="w-full">
+      <CardHeader className="space-y-4">
+        <div className="flex flex-col space-y-4 sm:space-y-0 sm:flex-row sm:justify-between sm:items-center">
+          <CardTitle className="text-xl sm:text-2xl">Text Enhancement</CardTitle>
           <Select value={selectedStyle} onValueChange={setSelectedStyle}>
-            <SelectTrigger className="w-[200px]">
+            <SelectTrigger className="w-full sm:w-[200px]">
               <SelectValue placeholder="Choose a style" />
             </SelectTrigger>
             <SelectContent>
@@ -129,57 +162,66 @@ export function TextStyleEnhancement({ originalText }) {
           </Select>
         </div>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          {selectedStyleInfo && (
-            <div className="text-sm text-gray-500">
-              {selectedStyleInfo.description}
-            </div>
+      <CardContent className="space-y-4">
+        {error && (
+          <div className="text-sm text-red-500 bg-red-50 dark:bg-red-900/20 p-3 rounded-lg">
+            {error}
+          </div>
+        )}
+        
+        <Button
+          onClick={handleEnhance}
+          disabled={loading || !selectedStyle || !originalText?.trim()}
+          className="w-full"
+        >
+          {loading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Enhancing...
+            </>
+          ) : (
+            "Enhance Text"
           )}
-          
-          <Button
-            onClick={handleEnhance}
-            disabled={loading || !selectedStyle || !originalText?.trim()}
-            className="w-full"
-          >
-            {loading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Enhancing...
-              </>
-            ) : (
-              "Enhance Text"
-            )}
-          </Button>
+        </Button>
 
-          {enhancedText && (
-            <div className="space-y-4">
-              <Textarea
-                value={enhancedText}
-                readOnly
-                className="min-h-[200px]"
-              />
-              <div className="flex gap-2">
-                <Button
-                  onClick={handleCopy}
-                  variant="outline"
-                  className="flex-1"
-                >
-                  <Copy className="mr-2 h-4 w-4" />
-                  Copy
-                </Button>
-                <Button
-                  onClick={handleDownload}
-                  variant="outline"
-                  className="flex-1"
-                >
-                  <Download className="mr-2 h-4 w-4" />
-                  Download
-                </Button>
-              </div>
+        {enhancedText && (
+          <div className="space-y-4">
+            <Textarea
+              value={enhancedText}
+              readOnly
+              className="min-h-[200px] w-full resize-none"
+            />
+            <div className="flex gap-2">
+              <Button
+                onClick={handleCopy}
+                variant="outline"
+                className="flex-1"
+              >
+                <Copy className="mr-2 h-4 w-4" />
+                Copy to Clipboard
+              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="flex-1">
+                    <Download className="mr-2 h-4 w-4" />
+                    Download as File
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-[200px]">
+                  <DropdownMenuItem onClick={() => handleDownload('txt')}>
+                    Text File (.txt)
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleDownload('csv')}>
+                    Spreadsheet (.csv)
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleDownload('docx')}>
+                    Document (.doc)
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
