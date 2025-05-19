@@ -117,7 +117,7 @@ export function PieChart({
   // Custom Legend component to make items clickable
   const CustomLegend = ({ payload, onLegendClick }) => {
     return (
-      <div className="flex flex-wrap justify-center gap-x-4 gap-y-2" style={{ paddingTop: '20px', fontSize: '12px' }}>
+      <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 pt-2 md:pt-8" style={{ fontSize: '12px' }}>
         {payload.map((entry, index) => (
           <div
             key={`legend-${index}`}
@@ -144,7 +144,7 @@ export function PieChart({
         {description && <CardDescription>{description}</CardDescription>}
       </CardHeader>
       <CardContent className="flex-1 pb-0">
-        <div className="mx-auto aspect-square max-h-[240x]">
+        <div className="mx-auto aspect-square max-h-[240px] md:pt-6">
           <ResponsiveContainer width="100%" height="100%">
             <RechartsPieChart>
               <Pie
@@ -160,7 +160,6 @@ export function PieChart({
                 onMouseEnter={onPieEnter}
                 onMouseLeave={onPieLeave}
                 activeShape={renderActiveShape}
-                label={({ percent }) => `${(percent * 100).toFixed(1)}%`}
                 labelLine={false}
               >
                 {chartData.map((entry, index) => (
