@@ -19,9 +19,9 @@ export function SentimentWordCloud({ words = [], sentimentScores = {} }) {
         if (!word) return false
         if (filter === "all") return true
         const score = sentimentScores[word] || 0
-        if (filter === "positive") return score > 0.3
-        if (filter === "negative") return score < -0.3
-        if (filter === "neutral") return score >= -0.3 && score <= 0.3
+        if (filter === "positive") return score > 0.2  // Higher threshold for positive
+        if (filter === "negative") return score < -0.2  // Higher threshold for negative
+        if (filter === "neutral") return score >= -0.2 && score <= 0.2  // Wider neutral range
         return true
       })
       .map((word) => ({
@@ -35,8 +35,8 @@ export function SentimentWordCloud({ words = [], sentimentScores = {} }) {
 
   const getSentimentColor = (word) => {
     const score = sentimentScores[word] || 0
-    if (score > 0.3) return "#22c55e" // green for positive
-    if (score < -0.3) return "#ef4444" // red for negative
+    if (score > 0.2) return "#22c55e" // green for positive
+    if (score < -0.2) return "#ef4444" // red for negative
     return "#3b82f6" // blue for neutral
   }
 
