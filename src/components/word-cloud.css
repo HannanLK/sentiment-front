@@ -1,0 +1,20 @@
+.word-cloud-container {
+  position: relative;
+  width: 100%;
+  height: 300px;
+  overflow: hidden;
+  background: transparent;
+}
+
+.word-cloud-container span {
+  position: absolute;
+  white-space: nowrap;
+  user-select: none;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.word-cloud-container span:hover {
+  transform: scale(1.1);
+  z-index: 10;
+} 

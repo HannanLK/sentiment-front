@@ -58,7 +58,7 @@ export function WordCloud({ words = [], sentimentScores = {} }) {
         </div>
       </CardHeader>
       <CardContent>
-        <div className="h-[400px] w-full relative">
+        <div className="h-[300px] w-full relative">
           {wordCloudData.length > 0 ? (
             <div className="word-cloud-container">
               {wordCloudData.map((word, index) => (
