@@ -91,9 +91,24 @@ export default function TextSentiment() {
     setResult(null)
     setError(null)
     try {
-      const response = await api.post("/text/analyze", { text })
-      setAnalysis(response.data)
-      setResult(response.data)
+      const response = await api.post("/text/analyze", { text: text })
+      console.log("TextSentiment - Full Analysis response:", JSON.stringify(response.data, null, 2));
+      console.log("TextSentiment - Response keys:", Object.keys(response.data));
+      console.log("TextSentiment - Confidence score:", response.data.confidence_score);
+      
+      // Ensure confidence_score is included
+      if (!response.data.confidence_score) {
+        console.warn("TextSentiment - No confidence score in response");
+      }
+      
+      // Create analysis object with all required fields
+      const analysisData = {
+        ...response.data,
+        confidence_score: response.data.confidence_score ?? 0
+      };
+      
+      setAnalysis(analysisData)
+      setResult(analysisData)
       toast({
         title: "Success",
         description: "Text analyzed successfully",
@@ -331,7 +346,7 @@ export default function TextSentiment() {
                 </CardContent>
               </Card>
 
-              <ModelConfidence confidenceScore={analysis.confidence_score} />
+              <ModelConfidence confidenceScore={analysis?.confidence_score ?? 0} />
             </div>
 
             <WordCloud 
