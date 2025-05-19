@@ -26,7 +26,7 @@ export function SentimentWordCloud({ words = [], sentimentScores = {} }) {
       })
       .map((word) => ({
         text: word,
-        value: Math.random() * 50 + 20, // Random value between 20 and 70 for size variation
+        value: Math.random() * 2000 + 1000, // Random value between 1000 and 3000 for larger size variation
         color: getSentimentColor(word),
       }))
 
@@ -40,12 +40,30 @@ export function SentimentWordCloud({ words = [], sentimentScores = {} }) {
     return "#3b82f6" // blue for neutral
   }
 
+  const getFontSize = (word) => {
+    // Calculate font size based on word value, with a minimum of 20px and maximum of 80px
+    return Math.min(Math.max(Math.sqrt(word.value) * 2, 20), 80)
+  }
+
+  const getFontWeight = (word) => {
+    // Make larger words bolder
+    const size = getFontSize(word)
+    if (size > 60) return "700"
+    if (size > 40) return "600"
+    return "500"
+  }
+
   const animatedWordRenderer = (data, ref) => (
     <AnimatedWordRenderer 
       ref={ref} 
       data={data} 
       animationDelay={(_word, index) => index * 50}
-      style={{ color: data.color }}
+      style={{ 
+        color: data.color,
+        fontFamily: "Roboto, sans-serif",
+        fontSize: `${getFontSize(data)}px`,
+        fontWeight: getFontWeight(data)
+      }}
     />
   )
 
@@ -68,17 +86,20 @@ export function SentimentWordCloud({ words = [], sentimentScores = {} }) {
         </div>
       </CardHeader>
       <CardContent>
-        <div className="h-[300px] w-full relative">
+        <div className="h-[400px] w-full relative">
           {wordCloudData.length > 0 ? (
             <div className="word-cloud-container">
               <WordCloud 
                 words={wordCloudData} 
-                width={800} 
-                height={300} 
+                width={1000} 
+                height={350} 
                 renderWord={animatedWordRenderer}
                 padding={2}
                 spiral="archimedean"
-                rotate={0}
+                rotate={() => 0}
+                font="Roboto, sans-serif"
+                fontSize={getFontSize}
+                fontWeight={getFontWeight}
               />
             </div>
           ) : (
