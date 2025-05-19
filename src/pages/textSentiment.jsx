@@ -11,6 +11,13 @@ import { RadarChart } from "../components/RadarChart"
 import { Card, CardHeader, CardTitle, CardContent } from "../components/ui/card"
 import { ModelConfidence } from "../components/ModelConfidence"
 import { FaRegTrashAlt } from "react-icons/fa"
+import { Button } from "../components/ui/button"
+import { Progress } from "@/components/ui/progress"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Badge } from "@/components/ui/badge"
+import { useToast } from "@/components/ui/use-toast"
+import { Loader2, AlertCircle, FileText, Trash2, BarChart2, Sparkles } from "lucide-react"
+import { api } from "@/lib/api"
 
 // Simple Error Boundary Component
 class ErrorBoundary extends React.Component {
@@ -53,34 +60,56 @@ export default function TextSentiment() {
   const [chartsReady, setChartsReady] = useState(false)
   const textareaRef = useRef(null)
   const [chartType, setChartType] = useState('pie'); // 'pie' or 'radar'
+  const [analysis, setAnalysis] = useState(null)
+  const [error, setError] = useState(null)
+  const { toast } = useToast()
 
-  const handleAnalyze = () => {
-    const trimmed = text.trim()
-    if (!trimmed || trimmed.split(/\s+/).length < 3) {
-      setWarning("Please enter at least 3 words to analyze")
-      return setTimeout(() => setWarning(""), 3000)
+  const handleAnalyze = async () => {
+    if (!text.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter some text to analyze",
+        variant: "destructive"
+      })
+      return
+    }
+
+    if (text.split(/\s+/).length < 3) {
+      toast({
+        title: "Warning",
+        description: "Please enter at least 3 words for better analysis",
+        variant: "destructive"
+      })
+      return
     }
 
     setLoading(true)
     setChartsReady(false)
     setResult(null)
-    // 💡 replace this with your real API call
-    setTimeout(() => {
-      setResult({
-        score:      76,
-        confidence: 0.82,
-        distribution: { Positive: 45, Neutral: 30, Negative: 25 },
-        radar: [
-          { sentiment: "Positive", count: 45 },
-          { sentiment: "Neutral",  count: 30 },
-          { sentiment: "Negative", count: 25 },
-        ],
+    setError(null)
+    try {
+      const response = await api.post("/text/analyze", { text })
+      setAnalysis(response.data)
+      setResult(response.data)
+      toast({
+        title: "Success",
+        description: "Text analyzed successfully",
       })
+    } catch (error) {
+      console.error("Error analyzing text:", error)
+      const errorMessage = error.response?.data?.detail || "Failed to analyze text. Please try again."
+      setError(errorMessage)
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive"
+      })
+    } finally {
       setLoading(false)
       setTimeout(() => {
         setChartsReady(true)
       }, 100)
-    }, 1000)
+    }
   }
 
   const handleClear = () => {
@@ -89,154 +118,205 @@ export default function TextSentiment() {
     setChartsReady(false)
     setClearFile(true)
     setTimeout(() => setClearFile(false), 100)
+    if (textareaRef.current) {
+      textareaRef.current.focus()
+    }
+  }
+
+  const handleFileUpload = (file) => {
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      setText(e.target.result)
+      toast({
+        title: "Success",
+        description: "File uploaded successfully",
+      })
+    }
+    reader.onerror = () => {
+      toast({
+        title: "Error",
+        description: "Failed to read file",
+        variant: "destructive"
+      })
+    }
+    reader.readAsText(file)
+  }
+
+  const getSentimentColor = (score) => {
+    if (score > 0.3) return "text-green-500"
+    if (score < -0.3) return "text-red-500"
+    return "text-yellow-500"
+  }
+
+  const getSentimentLabel = (score) => {
+    if (score > 0.3) return "Positive"
+    if (score < -0.3) return "Negative"
+    return "Neutral"
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#0a1124] transition-colors">
-      {/* Input Section */}
-      <div className="w-4/5 mx-auto py-8">
-        <h2 className="text-3xl mb-5 font-light text-gray-800 dark:text-white">
-          What's the vibe? Enter text to reveal its sentiment…
-        </h2>
-        <div className="rounded-lg border border-gray-200 dark:border-zinc-700 shadow-md">
-          <Textarea
-            ref={textareaRef}
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            placeholder="Type or paste something…"
-            className="w-full h-48 bg-transparent font-roboto text-lg text-gray-800 dark:text-white p-4 focus:outline-none dark:bg-[#161616dc]"
-          />
-          <div className="flex justify-between items-center border-t border-gray-200 dark:border-zinc-700 bg-gray-100 dark:bg-[#232323e2] p-3 rounded-b-lg">
-            <FileUploadToggle onFileSelect={(f) => {
-              const r = new FileReader()
-              r.onload = (e) => setText(e.target.result)
-              r.readAsText(f)
-            }} clearFileName={clearFile} />
-
-            <div className="flex items-center space-x-2">
-              <AnalyzeButton
-                onClick={handleAnalyze}
-                disabled={loading}
-                className="px-4 h-8 border border-black dark:border-blue-500 text-black dark:text-blue-400 hover:bg-gray-100 dark:hover:bg-blue-800"
-              >
-                {loading ? "Analyzing…" : "Analyze"}
-              </AnalyzeButton>
-
-              <button
-                onClick={handleClear}
-                className="h-8 w-8 flex items-center justify-center text-black dark:text-white hover:bg-gray-100 dark:hover:bg-zinc-800 rounded"
-                title="Clear text"
-              >
-                <FaRegTrashAlt className="w-5 h-5" />
-              </button>
-            </div>
-          </div>
-        </div>
-        {warningMessage && (
-          <p className="mt-2 text-red-600 dark:text-red-400">{warningMessage}</p>
-        )}
-      </div>
-
-      {/* Results Section */}
-      <section className="w-4/5 mx-auto py-8">
-        {/* Main two-column layout */}
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 items-start">
-          {/* Left Column: Sentiment Score and Confidence Level */}
-          <div className="grid grid-cols-1 gap-6">
-            {/* Top Left: Gauge Meter */}
-            <ErrorBoundary>
-              <GaugeMeter
-                id="text-gauge"
-                score={result?.score}
-                loading={!result}
-                className="bg-white dark:bg-[#161616]"
+    <div className="container mx-auto p-4 sm:p-6">
+      <div className="max-w-4xl mx-auto space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Sparkles className="h-5 w-5" />
+              Text Sentiment Analysis
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <Textarea
+                ref={textareaRef}
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+                placeholder="Type or paste your text here..."
+                className="min-h-[200px] resize-none"
               />
-            </ErrorBoundary>
-
-            {/* Bottom Left: Confidence Level */}
-            <ErrorBoundary>
-              <Card className="bg-white dark:bg-transparent">
-                <CardHeader>
-                  <CardTitle className="text-xl font-semibold">Confidence Level</CardTitle>
-                </CardHeader>
-                <CardContent className="p-6 pt-2">
-                  <div className="w-full mx-auto">
-                    {!result ? (
-                      <div className="w-full h-3 rounded-full overflow-hidden bg-gray-300 dark:bg-[#444]">
-                        <div className="h-full bg-gray-200 dark:bg-[#666] animate-pulse" />
-                      </div>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex-1">
+                  <input
+                    type="file"
+                    accept=".txt,.md,.doc,.docx"
+                    onChange={(e) => e.target.files[0] && handleFileUpload(e.target.files[0])}
+                    className="hidden"
+                    id="file-upload"
+                  />
+                  <label
+                    htmlFor="file-upload"
+                    className="inline-flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 cursor-pointer"
+                  >
+                    <FileText className="w-4 h-4 mr-2" />
+                    Upload File
+                  </label>
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    onClick={handleAnalyze}
+                    disabled={loading || !text.trim()}
+                    className="flex-1 sm:flex-none"
+                  >
+                    {loading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Analyzing...
+                      </>
                     ) : (
                       <>
-                        <div className="w-full h-3 rounded-full overflow-hidden bg-gray-300 dark:bg-[#444]">
-                          <div className="h-full bg-blue-500" style={{ width: `${Math.round(result.confidence * 100)}%` }} />
-                        </div>
-                        <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 text-center">{Math.round(result.confidence * 100)}%</div>
+                        <BarChart2 className="mr-2 h-4 w-4" />
+                        Analyze
                       </>
                     )}
-                  </div>
-                </CardContent>
-              </Card>
-            </ErrorBoundary>
-          </div>
-
-          {/* Right Column: Emotions Breakdown Chart */}
-          <div className="space-y-6">
-            <Card className="bg-white dark:bg-transparent border-0 shadow-none">
-              <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-                <CardTitle className="text-xl font-semibold">
-                  Emotions Breakdown
-                </CardTitle>
-                <div className="relative">
-                  <select value={chartType} onChange={(e) => setChartType(e.target.value)} className="appearance-none bg-white dark:bg-[#161616] border border-gray-300 dark:border-zinc-700 rounded-md py-1 pl-2 pr-8 text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 cursor-pointer">
-                    <option value="pie">Pie Chart</option>
-                    <option value="radar">Radar Chart</option>
-                  </select>
-                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700 dark:text-gray-300">
-                    <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
-                  </div>
+                  </Button>
+                  <Button
+                    onClick={handleClear}
+                    variant="outline"
+                    className="flex-1 sm:flex-none"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
                 </div>
-              </CardHeader>
-              <CardContent className="p-6 pt-2">
-                <ErrorBoundary>
-                  {chartType === 'pie' ? (
-                    <PieChart
-                      id="text-pie"
-                      title=""
-                      description="Positive / Neutral / Negative"
-                      data={result?.distribution && Object.entries(result.distribution).map(
-                        ([name, value]) => ({ name, value })
-                      )}
-                      config={{
-                        Positive: { label: "Positive", color: "hsl(142 71% 45%)" }, // Green
-                        Neutral:  { label: "Neutral",  color: "hsl(48 96% 45%)" },  // Yellow
-                        Negative: { label: "Negative", color: "hsl(0 84% 60%)" }, // Red
-                      }}
-                      loading={!result}
-                      className="bg-white dark:bg-transparent"
-                    />
-                  ) : (
-                    <RadarChart
-                      id="text-radar"
-                      title=""
-                      description="Positive / Neutral / Negative"
-                      data={result?.radar}
-                      angleKey="sentiment"
-                      dataKey="count"
-                      config={{
-                        Positive: { label: "Positive", color: "hsl(220 70% 50%)" }, // Blue
-                        Neutral:  { label: "Neutral",  color: "hsl(48 96% 45%)" }, // Yellow
-                        Negative: { label: "Negative", color: "hsl(0 84% 60%)" }, // Red
-                      }}
-                      loading={!result}
-                      className="bg-white dark:bg-transparent pb-0"
-                    />
-                  )}
-                </ErrorBoundary>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {error && (
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Error</AlertTitle>
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+
+        {loading ? (
+          <div className="space-y-4">
+            <Card>
+              <CardContent className="pt-6">
+                <div className="space-y-4">
+                  <div className="h-4 bg-gray-200 rounded animate-pulse" />
+                  <div className="h-4 bg-gray-200 rounded animate-pulse w-3/4" />
+                  <div className="h-4 bg-gray-200 rounded animate-pulse w-1/2" />
+                </div>
               </CardContent>
             </Card>
           </div>
-        </div>
-      </section>
+        ) : analysis && (
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Sentiment Analysis</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div>
+                    <div className="flex justify-between items-center mb-2">
+                      <p className="text-sm font-medium">Overall Sentiment</p>
+                      <Badge variant={analysis.sentiment_score > 0.3 ? "default" : analysis.sentiment_score < -0.3 ? "destructive" : "secondary"}>
+                        {getSentimentLabel(analysis.sentiment_score)}
+                      </Badge>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <Progress
+                        value={(analysis.sentiment_score + 1) * 50}
+                        className="flex-1"
+                      />
+                      <span className={`font-bold ${getSentimentColor(analysis.sentiment_score)}`}>
+                        {analysis.sentiment_score.toFixed(2)}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <p className="text-sm font-medium mb-2">Emotion Analysis</p>
+                    <div className="space-y-2">
+                      {Object.entries(analysis.emotion_scores).map(([emotion, score]) => (
+                        <div key={emotion}>
+                          <div className="flex justify-between mb-1">
+                            <span className="capitalize">{emotion}</span>
+                            <Badge variant="outline">
+                              {(score * 100).toFixed(1)}%
+                            </Badge>
+                          </div>
+                          <Progress value={score * 100} />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Key Insights</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm font-medium mb-2">Dominant Emotion</p>
+                    <Badge variant="secondary" className="capitalize">
+                      {Object.entries(analysis.emotion_scores).reduce((a, b) =>
+                        a[1] > b[1] ? a : b
+                      )[0]}
+                    </Badge>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium mb-2">Emotional Intensity</p>
+                    <Badge variant={Object.values(analysis.emotion_scores).reduce((a, b) => a + b, 0) / 
+                      Object.keys(analysis.emotion_scores).length > 0.5 ? "default" : "secondary"}>
+                      {Object.values(analysis.emotion_scores).reduce((a, b) => a + b, 0) / 
+                       Object.keys(analysis.emotion_scores).length > 0.5
+                        ? "High"
+                        : "Moderate"}
+                    </Badge>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+      </div>
     </div>
   )
 }
