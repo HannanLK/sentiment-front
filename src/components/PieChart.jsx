@@ -27,14 +27,14 @@ export function PieChart({
   description = "",
   data = {},
   config = {},
-  innerRadius = 60,
-  outerRadius = 80,
+  innerRadius = 50,
+  outerRadius = 70,
   width = 320,
   height = 320,
   loading = false,
   className = "",
 }) {
-  const [activeIndex, setActiveIndex] = useState(0)
+  const [activeIndex, setActiveIndex] = useState(null)
   const isDark = typeof window !== 'undefined'
     && document.documentElement.classList.contains('dark')
   const skeletonBg = isDark ? '#444' : '#eee'
@@ -84,6 +84,59 @@ export function PieChart({
     setActiveIndex(index)
   }
 
+  const onPieLeave = () => {
+    setActiveIndex(null)
+  }
+
+  const renderActiveShape = (props) => {
+    const { cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill, payload } = props
+    return (
+      <g>
+        <Sector
+          cx={cx}
+          cy={cy}
+          innerRadius={innerRadius}
+          outerRadius={outerRadius + 10}
+          startAngle={startAngle}
+          endAngle={endAngle}
+          fill={fill}
+        />
+        <Sector
+          cx={cx}
+          cy={cy}
+          startAngle={startAngle}
+          endAngle={endAngle}
+          innerRadius={outerRadius + 12}
+          outerRadius={outerRadius + 16}
+          fill={fill}
+        />
+      </g>
+    )
+  }
+
+  // Custom Legend component to make items clickable
+  const CustomLegend = ({ payload, onLegendClick }) => {
+    return (
+      <div className="flex flex-wrap justify-center gap-x-4 gap-y-2" style={{ paddingTop: '20px', fontSize: '12px' }}>
+        {payload.map((entry, index) => (
+          <div
+            key={`legend-${index}`}
+            className="flex items-center gap-1.5 cursor-pointer hover:opacity-80"
+            onClick={() => onLegendClick(index)}
+          >
+            <div
+              className="h-2 w-2 shrink-0 rounded-[2px]"
+              style={{
+                backgroundColor: entry.color,
+              }}
+            />
+            <span className="text-xs text-muted-foreground">{entry.value}</span>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   return (
     <Card className="flex flex-col">
       <CardHeader className="items-center pb-0">
@@ -91,7 +144,7 @@ export function PieChart({
         {description && <CardDescription>{description}</CardDescription>}
       </CardHeader>
       <CardContent className="flex-1 pb-0">
-        <div className="mx-auto aspect-square max-h-[250px]">
+        <div className="mx-auto aspect-square max-h-[240x]">
           <ResponsiveContainer width="100%" height="100%">
             <RechartsPieChart>
               <Pie
@@ -105,12 +158,18 @@ export function PieChart({
                 nameKey="name"
                 activeIndex={activeIndex}
                 onMouseEnter={onPieEnter}
-                activeShape={({ outerRadius = 0, ...props }) => (
-                  <Sector {...props} outerRadius={outerRadius + 10} />
-                )}
+                onMouseLeave={onPieLeave}
+                activeShape={renderActiveShape}
+                label={({ percent }) => `${(percent * 100).toFixed(1)}%`}
+                labelLine={false}
               >
                 {chartData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.fill} />
+                  <Cell 
+                    key={`cell-${index}`} 
+                    fill={entry.fill}
+                    stroke={entry.fill}
+                    strokeWidth={2}
+                  />
                 ))}
               </Pie>
               <Tooltip
@@ -119,16 +178,12 @@ export function PieChart({
                   backgroundColor: isDark ? '#1f1f1f' : '#ffffff',
                   border: 'none',
                   borderRadius: '8px',
-                  boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                  fontSize: '12px'
                 }}
               />
               <Legend
-                layout="vertical"
-                verticalAlign="middle"
-                align="right"
-                wrapperStyle={{
-                  paddingLeft: '20px'
-                }}
+                content={<CustomLegend onLegendClick={(index) => setActiveIndex(index)} />}
               />
             </RechartsPieChart>
           </ResponsiveContainer>
