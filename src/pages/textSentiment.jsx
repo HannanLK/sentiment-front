@@ -151,6 +151,12 @@ export default function TextSentiment() {
     return "text-yellow-500"
   }
 
+  const getProgressBarColor = (score) => {
+    if (score > 0.3) return "linear-gradient(to right, #10B981, #34D399)"; // green gradient
+    if (score < -0.3) return "linear-gradient(to right, #EF4444, #F87171)"; // red gradient
+    return "linear-gradient(to right, #F59E0B, #FBBF24)"; // yellow gradient
+  }
+
   const getSentimentLabel = (score) => {
     if (score > 0.3) return "Positive"
     if (score < -0.3) return "Negative"
@@ -264,6 +270,7 @@ export default function TextSentiment() {
                         <Progress
                           value={(analysis.sentiment_score + 1) * 50}
                           className="flex-1"
+                          style={{ backgroundImage: getProgressBarColor(analysis.sentiment_score) }}
                         />
                         <span className={`font-bold ${getSentimentColor(analysis.sentiment_score)}`}>
                           {analysis.sentiment_score.toFixed(2)}
