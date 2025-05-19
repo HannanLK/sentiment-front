@@ -18,6 +18,9 @@ import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/components/ui/use-toast"
 import { Loader2, AlertCircle, FileText, Trash2, BarChart2, Sparkles } from "lucide-react"
 import { api } from "@/lib/api"
+import { EmotionsDistribution } from "../components/EmotionsDistribution"
+import { WordCloud } from "../components/WordCloud"
+import { TextStyleEnhancement } from "../components/TextStyleEnhancement"
 
 // Simple Error Boundary Component
 class ErrorBoundary extends React.Component {
@@ -243,77 +246,93 @@ export default function TextSentiment() {
           </div>
         ) : analysis && (
           <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Sentiment Analysis</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div>
-                    <div className="flex justify-between items-center mb-2">
-                      <p className="text-sm font-medium">Overall Sentiment</p>
-                      <Badge variant={analysis.sentiment_score > 0.3 ? "default" : analysis.sentiment_score < -0.3 ? "destructive" : "secondary"}>
-                        {getSentimentLabel(analysis.sentiment_score)}
-                      </Badge>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Sentiment Analysis</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div>
+                      <div className="flex justify-between items-center mb-2">
+                        <p className="text-sm font-medium">Overall Sentiment</p>
+                        <Badge variant={analysis.sentiment_score > 0.3 ? "default" : analysis.sentiment_score < -0.3 ? "destructive" : "secondary"}>
+                          {getSentimentLabel(analysis.sentiment_score)}
+                        </Badge>
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <Progress
+                          value={(analysis.sentiment_score + 1) * 50}
+                          className="flex-1"
+                        />
+                        <span className={`font-bold ${getSentimentColor(analysis.sentiment_score)}`}>
+                          {analysis.sentiment_score.toFixed(2)}
+                        </span>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-4">
-                      <Progress
-                        value={(analysis.sentiment_score + 1) * 50}
-                        className="flex-1"
-                      />
-                      <span className={`font-bold ${getSentimentColor(analysis.sentiment_score)}`}>
-                        {analysis.sentiment_score.toFixed(2)}
-                      </span>
-                    </div>
-                  </div>
 
-                  <div>
-                    <p className="text-sm font-medium mb-2">Emotion Analysis</p>
-                    <div className="space-y-2">
-                      {Object.entries(analysis.emotion_scores).map(([emotion, score]) => (
-                        <div key={emotion}>
-                          <div className="flex justify-between mb-1">
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-semibold">Emotion Analysis</h3>
+                      {analysis?.emotion_scores && Object.entries(analysis.emotion_scores).map(([emotion, score]) => (
+                        <div key={emotion} className="space-y-2">
+                          <div className="flex justify-between text-sm">
                             <span className="capitalize">{emotion}</span>
-                            <Badge variant="outline">
-                              {(score * 100).toFixed(1)}%
-                            </Badge>
+                            <span>{(score * 100).toFixed(1)}%</span>
                           </div>
-                          <Progress value={score * 100} />
+                          <div className="h-2 bg-secondary rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-primary transition-all duration-500"
+                              style={{ width: `${score * 100}%` }}
+                            />
+                          </div>
                         </div>
                       ))}
                     </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Key Insights</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-sm font-medium mb-2">Dominant Emotion</p>
-                    <Badge variant="secondary" className="capitalize">
-                      {Object.entries(analysis.emotion_scores).reduce((a, b) =>
-                        a[1] > b[1] ? a : b
-                      )[0]}
-                    </Badge>
+              <EmotionsDistribution emotionScores={analysis.emotion_scores} />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Key Insights</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-sm font-medium mb-2">Dominant Emotion</p>
+                      <Badge variant="secondary" className="capitalize">
+                        {Object.entries(analysis.emotion_scores).reduce((a, b) =>
+                          a[1] > b[1] ? a : b
+                        )[0]}
+                      </Badge>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium mb-2">Emotional Intensity</p>
+                      <Badge variant={Object.values(analysis.emotion_scores).reduce((a, b) => a + b, 0) / 
+                        Object.keys(analysis.emotion_scores).length > 0.5 ? "default" : "secondary"}>
+                        {Object.values(analysis.emotion_scores).reduce((a, b) => a + b, 0) / 
+                         Object.keys(analysis.emotion_scores).length > 0.5
+                          ? "High"
+                          : "Moderate"}
+                      </Badge>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-sm font-medium mb-2">Emotional Intensity</p>
-                    <Badge variant={Object.values(analysis.emotion_scores).reduce((a, b) => a + b, 0) / 
-                      Object.keys(analysis.emotion_scores).length > 0.5 ? "default" : "secondary"}>
-                      {Object.values(analysis.emotion_scores).reduce((a, b) => a + b, 0) / 
-                       Object.keys(analysis.emotion_scores).length > 0.5
-                        ? "High"
-                        : "Moderate"}
-                    </Badge>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+
+              <ModelConfidence confidenceScore={analysis.confidence_score} />
+            </div>
+
+            <WordCloud 
+              words={analysis?.key_phrases || []} 
+              sentimentScores={analysis?.word_sentiment_scores || {}} 
+            />
+
+            <TextStyleEnhancement originalText={text} />
           </div>
         )}
       </div>

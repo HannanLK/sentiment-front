@@ -1,49 +1,37 @@
 "use client"
 
-import * as React from "react"
-import { Progress } from "./ui/progress"
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-} from "./ui/card"
-import { Skeleton } from "./ui/skeleton"
+import React from 'react';
+import { Card, CardHeader, CardTitle, CardContent } from "./ui/card";
+import { Progress } from "./ui/progress";
+import { Badge } from "./ui/badge";
 
-export function ModelConfidence({ confidence = 0, loading = false }) {
-  const [value, setValue] = React.useState(0)
+export function ModelConfidence({ confidenceScore }) {
+  const getConfidenceLevel = (score) => {
+    if (score >= 0.8) return { label: "High", variant: "default" };
+    if (score >= 0.5) return { label: "Medium", variant: "secondary" };
+    return { label: "Low", variant: "destructive" };
+  };
 
-  React.useEffect(() => {
-    if (!loading) {
-      setValue(Math.round(confidence * 100))
-    }
-  }, [confidence, loading])
-
-  if (loading) {
-    return (
-      <Card>
-        <CardHeader>
-          <Skeleton className="w-32 h-6" />
-        </CardHeader>
-        <CardContent>
-          <Skeleton className="w-full h-4" />
-          <Skeleton className="w-16 h-4 mt-2" />
-        </CardContent>
-      </Card>
-    )
-  }
+  const confidenceLevel = getConfidenceLevel(confidenceScore);
 
   return (
-    <Card className="bg-white dark:bg-[#161616]">
+    <Card>
       <CardHeader>
-        <CardTitle>Confidence Level</CardTitle>
+        <CardTitle className="text-sm font-medium">Model Confidence</CardTitle>
       </CardHeader>
       <CardContent>
-        <Progress value={value} className="w-full" />
-        <p className="mt-2 text-sm text-muted-foreground">
-          {value}%
-        </p>
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <Progress value={confidenceScore * 100} className="flex-1 mr-4" />
+            <Badge variant={confidenceLevel.variant}>
+              {confidenceLevel.label}
+            </Badge>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            Confidence Score: {(confidenceScore * 100).toFixed(1)}%
+          </p>
+        </div>
       </CardContent>
     </Card>
-  )
+  );
 }
