@@ -4,17 +4,22 @@
   height: 300px;
   overflow: hidden;
   background: transparent;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.word-cloud-container span {
-  position: absolute;
-  white-space: nowrap;
-  user-select: none;
-  transition: all 0.3s ease;
+.word-cloud-container svg {
+  width: 100%;
+  height: 100%;
+}
+
+.word-cloud-container text {
   cursor: pointer;
+  transition: all 0.3s ease;
 }
 
-.word-cloud-container span:hover {
+.word-cloud-container text:hover {
   transform: scale(1.1);
-  z-index: 10;
+  filter: brightness(1.2);
 } 

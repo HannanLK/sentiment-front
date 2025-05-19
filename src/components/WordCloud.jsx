@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react"
 import { Card, CardHeader, CardTitle, CardContent } from "./ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select"
+import { WordCloud, AnimatedWordRenderer } from "@isoterik/react-word-cloud"
 import "./word-cloud.css"
 
-export function WordCloud({ words = [], sentimentScores = {} }) {
+export function SentimentWordCloud({ words = [], sentimentScores = {} }) {
   const [filter, setFilter] = useState("all")
   const [wordCloudData, setWordCloudData] = useState([])
 
@@ -25,7 +26,7 @@ export function WordCloud({ words = [], sentimentScores = {} }) {
       })
       .map((word) => ({
         text: word,
-        size: Math.random() * 2 + 1, // Random size between 1 and 3
+        value: Math.random() * 50 + 20, // Random value between 20 and 70 for size variation
         color: getSentimentColor(word),
       }))
 
@@ -34,10 +35,19 @@ export function WordCloud({ words = [], sentimentScores = {} }) {
 
   const getSentimentColor = (word) => {
     const score = sentimentScores[word] || 0
-    if (score > 0.3) return "text-green-500" // positive
-    if (score < -0.3) return "text-red-500" // negative
-    return "text-blue-500" // neutral
+    if (score > 0.3) return "#22c55e" // green for positive
+    if (score < -0.3) return "#ef4444" // red for negative
+    return "#3b82f6" // blue for neutral
   }
+
+  const animatedWordRenderer = (data, ref) => (
+    <AnimatedWordRenderer 
+      ref={ref} 
+      data={data} 
+      animationDelay={(_word, index) => index * 50}
+      style={{ color: data.color }}
+    />
+  )
 
   return (
     <Card>
@@ -61,21 +71,15 @@ export function WordCloud({ words = [], sentimentScores = {} }) {
         <div className="h-[300px] w-full relative">
           {wordCloudData.length > 0 ? (
             <div className="word-cloud-container">
-              {wordCloudData.map((word, index) => (
-                <span
-                  key={index}
-                  className={`absolute ${word.color} transition-all duration-300 hover:scale-110 cursor-pointer`}
-                  style={{
-                    fontSize: `${word.size}rem`,
-                    left: `${Math.random() * 80}%`,
-                    top: `${Math.random() * 80}%`,
-                    transform: `rotate(${Math.random() * 360}deg)`,
-                  }}
-                  title={`Sentiment: ${sentimentScores[word.text]?.toFixed(2) || 0}`}
-                >
-                  {word.text}
-                </span>
-              ))}
+              <WordCloud 
+                words={wordCloudData} 
+                width={800} 
+                height={300} 
+                renderWord={animatedWordRenderer}
+                padding={2}
+                spiral="archimedean"
+                rotate={0}
+              />
             </div>
           ) : (
             <div className="h-full flex items-center justify-center text-gray-500">

@@ -19,7 +19,7 @@ import { useToast } from "@/components/ui/use-toast"
 import { Loader2, AlertCircle, FileText, Trash2, BarChart2, Sparkles } from "lucide-react"
 import { api } from "@/lib/api"
 import { EmotionsDistribution } from "../components/EmotionsDistribution"
-import { WordCloud } from "../components/WordCloud"
+import { SentimentWordCloud } from "../components/WordCloud"
 import { TextStyleEnhancement } from "../components/TextStyleEnhancement"
 
 // Simple Error Boundary Component
@@ -349,7 +349,7 @@ export default function TextSentiment() {
               <ModelConfidence confidenceScore={analysis?.confidence_score ?? 0} />
             </div>
 
-            <WordCloud 
+            <SentimentWordCloud 
               words={analysis?.key_phrases || []} 
               sentimentScores={analysis?.word_sentiment_scores || {}} 
             />
