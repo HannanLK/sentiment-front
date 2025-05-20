@@ -19,9 +19,9 @@ export function SentimentWordCloud({ words = [], sentimentScores = {} }) {
         if (!word) return false
         if (filter === "all") return true
         const score = sentimentScores[word] || 0
-        if (filter === "positive") return score > 0.2  // Higher threshold for positive
-        if (filter === "negative") return score < -0.2  // Higher threshold for negative
-        if (filter === "neutral") return score >= -0.2 && score <= 0.2  // Wider neutral range
+        if (filter === "positive") return score > 0.1  // Lower threshold for positive
+        if (filter === "negative") return score < -0.1  // Lower threshold for negative
+        if (filter === "neutral") return score >= -0.1 && score <= 0.1  // Narrower neutral range
         return true
       })
       .map((word) => ({
