@@ -54,18 +54,59 @@ class ErrorBoundary extends React.Component {
   }
 }
 
+// Welcome Message Component
+const WelcomeMessage = () => (
+  <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950 border-none">
+    <CardContent className="pt-6">
+      <div className="space-y-4 text-center">
+        <h2 className="text-2xl font-semibold tracking-wider bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+          Welcome to <span className="font-logo font-bold">VibeCheck</span>
+        </h2>
+        <p className="text-gray-600 dark:text-gray-300">
+          Unlock the power of AI-driven text analysis. Discover sentiment, emotions, and key insights from your text in seconds.
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-500 dark:text-gray-400">
+          <div className="p-3 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+            <span className="font-semibold">SENTIMENT ANALYSIS</span>
+            <p>Understand the emotional tone of your text</p>
+          </div>
+          <div className="p-3 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+            <span className="font-semibold">EMOTION DETECTION</span>
+            <p>Identify specific emotions in your content</p>
+          </div>
+          <div className="p-3 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+            <span className="font-semibold">KEY INSIGHTS</span>
+            <p>Get valuable insights and word cloud visualization</p>
+          </div>
+        </div>
+      </div>
+    </CardContent>
+  </Card>
+)
+
 export default function TextSentiment() {
-  const [text, setText]             = useState("")
-  const [clearFile, setClearFile]   = useState(false)
+  const [text, setText] = useState(() => {
+    // Initialize text from localStorage if available
+    const savedText = localStorage.getItem('vibeCheckText')
+    return savedText || ""
+  })
+  const [clearFile, setClearFile] = useState(false)
   const [warningMessage, setWarning] = useState("")
-  const [loading, setLoading]       = useState(false)
-  const [result, setResult]         = useState(null)
+  const [loading, setLoading] = useState(false)
+  const [result, setResult] = useState(null)
   const [chartsReady, setChartsReady] = useState(false)
   const textareaRef = useRef(null)
-  const [chartType, setChartType] = useState('pie'); // 'pie' or 'radar'
+  const [chartType, setChartType] = useState('pie')
   const [analysis, setAnalysis] = useState(null)
   const [error, setError] = useState(null)
   const { toast } = useToast()
+
+  // Save text to localStorage whenever it changes
+  useEffect(() => {
+    if (text) {
+      localStorage.setItem('vibeCheckText', text)
+    }
+  }, [text])
 
   const handleAnalyze = async () => {
     if (!text.trim()) {
@@ -90,22 +131,20 @@ export default function TextSentiment() {
     setChartsReady(false)
     setResult(null)
     setError(null)
+    setAnalysis(null) // Clear previous analysis
+
     try {
       const response = await api.post("/text/analyze", { text: text })
-      console.log("TextSentiment - Full Analysis response:", JSON.stringify(response.data, null, 2));
-      console.log("TextSentiment - Response keys:", Object.keys(response.data));
-      console.log("TextSentiment - Confidence score:", response.data.confidence_score);
-      
-      // Ensure confidence_score is included
-      if (!response.data.confidence_score) {
-        console.warn("TextSentiment - No confidence score in response");
-      }
+      console.log("TextSentiment - Full Analysis response:", JSON.stringify(response.data, null, 2))
       
       // Create analysis object with all required fields
       const analysisData = {
         ...response.data,
         confidence_score: response.data.confidence_score ?? 0
-      };
+      }
+      
+      // Add artificial delay for skeleton effect
+      await new Promise(resolve => setTimeout(resolve, 2000))
       
       setAnalysis(analysisData)
       setResult(analysisData)
@@ -133,8 +172,10 @@ export default function TextSentiment() {
   const handleClear = () => {
     setText("")
     setResult(null)
+    setAnalysis(null) // Clear analysis when clearing text
     setChartsReady(false)
     setClearFile(true)
+    localStorage.removeItem('vibeCheckText') // Remove from localStorage
     setTimeout(() => setClearFile(false), 100)
     if (textareaRef.current) {
       textareaRef.current.focus()
@@ -195,7 +236,7 @@ export default function TextSentiment() {
                 value={text}
                 onChange={(e) => setText(e.target.value)}
                 placeholder="Type or paste your text here..."
-                className="min-h-[200px] resize-none"
+                className="min-h-[200px] resize-none font-roboto text-base"
               />
               <div className="flex flex-col sm:flex-row gap-4">
                 <div className="flex-1">
@@ -252,6 +293,8 @@ export default function TextSentiment() {
             <AlertDescription>{error}</AlertDescription>
           </Alert>
         )}
+
+        {!analysis && !loading && <WelcomeMessage />}
 
         {loading ? (
           <div className="space-y-4">
