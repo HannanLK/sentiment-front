@@ -13,9 +13,6 @@ export default function MobileMenu({ isOpen, setIsOpen }) {
         <Link to="/textSentiment" onClick={() => setIsOpen(false)} className="block hover:underline">
           Text Analyzer
         </Link>
-        <Link to="/productSentiment" onClick={() => setIsOpen(false)} className="block hover:underline">
-          Product Reviews
-        </Link>
         <Link to="/socialSentiment" onClick={() => setIsOpen(false)} className="block hover:underline">
           Social Media
         </Link>
