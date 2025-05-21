@@ -53,7 +53,9 @@ export function TextStyleEnhancement({ originalText }) {
     try {
       const response = await api.post("/text/enhance", {
         text: originalText,
-        style: selectedStyle
+        style: selectedStyle,
+        prompt: "Please expand this passage into a long, richly detailed narrative—at least three times its current length—using vivid, descriptive language and fully developed sentences.",
+        max_tokens: 1024
       });
       
       if (response.data && response.data.enhancedText) {
