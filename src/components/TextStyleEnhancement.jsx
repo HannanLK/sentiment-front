@@ -188,7 +188,7 @@ export function TextStyleEnhancement({ originalText }) {
             <Textarea
               value={enhancedText}
               readOnly
-              className="min-h-[200px] w-full resize-none"
+              className="min-h-[200px] w-full resize-none font-roboto text-base"
             />
             <div className="flex gap-2">
               <Button

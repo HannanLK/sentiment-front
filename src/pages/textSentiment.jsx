@@ -92,11 +92,19 @@ export default function TextSentiment() {
   const [clearFile, setClearFile] = useState(false)
   const [warningMessage, setWarning] = useState("")
   const [loading, setLoading] = useState(false)
-  const [result, setResult] = useState(null)
+  const [result, setResult] = useState(() => {
+    // Initialize result from localStorage if available
+    const savedResult = localStorage.getItem('vibeCheckResult')
+    return savedResult ? JSON.parse(savedResult) : null
+  })
   const [chartsReady, setChartsReady] = useState(false)
   const textareaRef = useRef(null)
   const [chartType, setChartType] = useState('pie')
-  const [analysis, setAnalysis] = useState(null)
+  const [analysis, setAnalysis] = useState(() => {
+    // Initialize analysis from localStorage if available
+    const savedAnalysis = localStorage.getItem('vibeCheckAnalysis')
+    return savedAnalysis ? JSON.parse(savedAnalysis) : null
+  })
   const [error, setError] = useState(null)
   const { toast } = useToast()
 
@@ -106,6 +114,32 @@ export default function TextSentiment() {
       localStorage.setItem('vibeCheckText', text)
     }
   }, [text])
+
+  // Save analysis to localStorage whenever it changes
+  useEffect(() => {
+    if (analysis) {
+      localStorage.setItem('vibeCheckAnalysis', JSON.stringify(analysis))
+    }
+  }, [analysis])
+
+  // Save result to localStorage whenever it changes
+  useEffect(() => {
+    if (result) {
+      localStorage.setItem('vibeCheckResult', JSON.stringify(result))
+    }
+  }, [result])
+
+  // Clear localStorage on page refresh
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      localStorage.removeItem('vibeCheckText')
+      localStorage.removeItem('vibeCheckAnalysis')
+      localStorage.removeItem('vibeCheckResult')
+    }
+
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
+  }, [])
 
   const handleAnalyze = async () => {
     if (!text.trim()) {
@@ -184,10 +218,12 @@ export default function TextSentiment() {
   const handleClear = () => {
     setText("")
     setResult(null)
-    setAnalysis(null) // Clear analysis when clearing text
+    setAnalysis(null)
     setChartsReady(false)
     setClearFile(true)
-    localStorage.removeItem('vibeCheckText') // Remove from localStorage
+    localStorage.removeItem('vibeCheckText')
+    localStorage.removeItem('vibeCheckAnalysis')
+    localStorage.removeItem('vibeCheckResult')
     setTimeout(() => setClearFile(false), 100)
     if (textareaRef.current) {
       textareaRef.current.focus()
