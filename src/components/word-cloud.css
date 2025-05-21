@@ -27,4 +27,20 @@
 .word-cloud-container text:hover {
   transform: scale(1.1);
   filter: brightness(1.2);
+}
+
+@media (max-width: 640px) {
+  .word-cloud-container {
+    height: 220px;
+    margin: 0;
+    padding: 8px;
+  }
+  .word-cloud-container canvas {
+    width: 100% !important;
+    height: 100% !important;
+    transform: scale(1.2);
+  }
+  .word-cloud-container svg {
+    transform: scale(1.2);
+  }
 } 

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react"
+import React, { useState, useMemo, useEffect } from "react"
 import { Card, CardHeader, CardTitle, CardContent } from "./ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select"
 import { WordCloud, AnimatedWordRenderer } from "@isoterik/react-word-cloud"
@@ -17,11 +17,23 @@ export function SentimentWordCloud({
   sentimentScores = {}
 }) {
   const [filter, setFilter] = useState('all')
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 640)
+    }
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
+
   console.log('WordCloud received props:', {
     wordsCount: words?.length || 0,
     frequenciesCount: Object.keys(frequencies || {}).length,
     sentimentScoresCount: Object.keys(sentimentScores || {}).length,
-    filter
+    filter,
+    isMobile
   })
 
   const cloudData = useMemo(() => {
@@ -60,18 +72,20 @@ export function SentimentWordCloud({
   console.log('cloudData:', cloudData)
 
   const getFontSize = (word) => {
-    if (!cloudData.length) return 15
+    if (!cloudData.length) return isMobile ? 24 : 30
     const vals = cloudData.map(w => w.value)
     const min = Math.min(...vals)
     const max = Math.max(...vals)
     const norm = max === min ? 0.5 : (word.value - min) / (max - min)
-    return 15 + norm * 55
+    return isMobile 
+      ? 24 + norm * 96  // 24-120px range for mobile
+      : 30 + norm * 120 // 30-150px range for desktop
   }
 
   const getFontWeight = (word) => {
     const size = getFontSize(word)
-    if (size > 60) return "700"
-    if (size > 40) return "600"
+    if (size > 80) return "700"
+    if (size > 50) return "600"
     return "500"
   }
 
@@ -108,7 +122,7 @@ export function SentimentWordCloud({
         </div>
       </CardHeader>
       <CardContent>
-        <div className="h-[400px] w-full relative">
+        <div className="h-[220px] md:h-[400px] w-full relative">
           {cloudData.length > 0 ? (
             <div className="word-cloud-container">
               <WordCloud 
@@ -122,6 +136,7 @@ export function SentimentWordCloud({
                 font="Roboto, sans-serif"
                 fontSize={getFontSize}
                 fontWeight={getFontWeight}
+                fontSizes={isMobile ? [24, 120] : [30, 150]}
               />
             </div>
           ) : (
