@@ -14,13 +14,12 @@ import {
 } from "./ui/dropdown-menu";
 
 const styleOptions = [
-  { value: 'funny', label: 'Funny and Humorous' },
-  { value: 'emotional', label: 'Emotional and Passionate' },
-  { value: 'storytelling', label: 'Storytelling' },
-  { value: 'professional', label: 'Professional' },
   { value: 'technical', label: 'Technical' },
+  { value: 'storytelling', label: 'Storytelling' },
+  { value: 'formal', label: 'Formal' },
   { value: 'casual', label: 'Casual' },
-  { value: 'informal', label: 'Informal' }
+  { value: 'academic', label: 'Academic' },
+  { value: 'poetic', label: 'Poetic' }
 ];
 
 export function TextStyleEnhancement({ originalText }) {
@@ -57,8 +56,8 @@ export function TextStyleEnhancement({ originalText }) {
         style: selectedStyle
       });
       
-      if (response.data && response.data.enhanced_text) {
-        setEnhancedText(response.data.enhanced_text);
+      if (response.data && response.data.enhancedText) {
+        setEnhancedText(response.data.enhancedText);
         toast({
           title: "Success",
           description: "Text enhanced successfully"
