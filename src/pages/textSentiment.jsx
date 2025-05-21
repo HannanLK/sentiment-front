@@ -134,12 +134,25 @@ export default function TextSentiment() {
 
     try {
       const response = await api.post("/text/analyze", { text: text })
-      console.log("TextSentiment - Full Analysis response:", JSON.stringify(response.data, null, 2))
+      const data = response.data
+      console.log('API data:', data)
+      
+      // Destructure exactly the fields we need
+      const { unique_words, word_frequencies, word_sentiment_scores } = data
+      console.log('Word cloud data:', {
+        unique_words: unique_words?.length || 0,
+        word_frequencies: Object.keys(word_frequencies || {}).length,
+        word_sentiment_scores: Object.keys(word_sentiment_scores || {}).length
+      })
       
       // Create analysis object with all required fields
       const analysisData = {
-        ...response.data,
-        confidence_score: response.data.confidence_score ?? 0
+        sentiment_score: data.sentiment_score ?? 0,
+        emotion_scores: data.emotion_scores || {},
+        confidence_score: data.confidence_score ?? 0,
+        unique_words: unique_words || [],
+        word_frequencies: word_frequencies || {},
+        word_sentiment_scores: word_sentiment_scores || {}
       }
       
       // Add artificial delay for skeleton effect
@@ -392,8 +405,9 @@ export default function TextSentiment() {
             </div>
 
             <SentimentWordCloud 
-              words={analysis?.key_phrases || []} 
-              sentimentScores={analysis?.word_sentiment_scores || {}} 
+              words={analysis.unique_words}
+              frequencies={analysis.word_frequencies}
+              sentimentScores={analysis.word_sentiment_scores}
             />
 
             <TextStyleEnhancement originalText={text} />

@@ -1,52 +1,74 @@
-import React, { useState, useEffect } from "react"
+import React, { useState, useMemo } from "react"
 import { Card, CardHeader, CardTitle, CardContent } from "./ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select"
 import { WordCloud, AnimatedWordRenderer } from "@isoterik/react-word-cloud"
 import "./word-cloud.css"
 
-export function SentimentWordCloud({ words = [], sentimentScores = {} }) {
-  const [filter, setFilter] = useState("all")
-  const [wordCloudData, setWordCloudData] = useState([])
+// Move getSentimentColor to the top
+function getSentimentColor(score) {
+  if (score > 0.2) return "#22c55e" // green for positive
+  if (score < -0.2) return "#ef4444" // red for negative
+  return "#3b82f6" // blue for neutral
+}
 
-  useEffect(() => {
-    if (!Array.isArray(words) || words.length === 0) {
-      setWordCloudData([])
-      return
+export function SentimentWordCloud({
+  words = [],
+  frequencies = {},
+  sentimentScores = {}
+}) {
+  const [filter, setFilter] = useState('all')
+  console.log('WordCloud received props:', {
+    wordsCount: words?.length || 0,
+    frequenciesCount: Object.keys(frequencies || {}).length,
+    sentimentScoresCount: Object.keys(sentimentScores || {}).length,
+    filter
+  })
+
+  const cloudData = useMemo(() => {
+    // Combine words from both sources and ensure uniqueness
+    const combined = Array.from(new Set([
+      ...(words || []),
+      ...Object.keys(frequencies || {})
+    ]))
+    console.log('Combined unique words:', combined.length)
+
+    if (!combined.length) {
+      console.log('No words to display')
+      return []
     }
 
-    const filteredWords = words
-      .filter((word) => {
-        if (!word) return false
-        if (filter === "all") return true
-        const score = sentimentScores[word] || 0
-        if (filter === "positive") return score > 0.1  // Lower threshold for positive
-        if (filter === "negative") return score < -0.1  // Lower threshold for negative
-        if (filter === "neutral") return score >= -0.1 && score <= 0.1  // Narrower neutral range
-        return true
-      })
-      .map((word) => ({
-        text: word,
-        value: Math.random() * 2000 + 1000, // Random value between 1000 and 3000 for larger size variation
-        color: getSentimentColor(word),
-      }))
+    // Filter words based on sentiment
+    const filtered = combined.filter(w => {
+      if (filter === 'all') return true
+      const score = sentimentScores[w] ?? 0
+      return filter === 'positive' ? score > 0
+           : filter === 'negative' ? score < 0
+           : true
+    })
+    console.log('Filtered words:', filtered.length)
 
-    setWordCloudData(filteredWords)
-  }, [words, filter, sentimentScores])
+    // Map to cloud data format
+    const data = filtered.map(w => ({
+      text: w,
+      value: frequencies[w] ?? 1,
+      color: getSentimentColor(sentimentScores[w] ?? 0)
+    }))
+    console.log('Cloud data points:', data.length)
+    return data
+  }, [words, frequencies, sentimentScores, filter])
 
-  const getSentimentColor = (word) => {
-    const score = sentimentScores[word] || 0
-    if (score > 0.2) return "#22c55e" // green for positive
-    if (score < -0.2) return "#ef4444" // red for negative
-    return "#3b82f6" // blue for neutral
-  }
+  console.log('cloudData:', cloudData)
 
   const getFontSize = (word) => {
-    // Calculate font size based on word value, with a minimum of 20px and maximum of 80px
-    return Math.min(Math.max(Math.sqrt(word.value) * 2, 20), 80)
+    if (!cloudData.length) return 15
+    const vals = cloudData.map(w => w.value)
+    const min = Math.min(...vals)
+    const max = Math.max(...vals)
+    const norm = max === min ? 0.5 : (word.value - min) / (max - min)
+    return 15 + norm * 55
   }
 
   const getFontWeight = (word) => {
-    // Make larger words bolder
     const size = getFontSize(word)
     if (size > 60) return "700"
     if (size > 40) return "600"
@@ -87,16 +109,16 @@ export function SentimentWordCloud({ words = [], sentimentScores = {} }) {
       </CardHeader>
       <CardContent>
         <div className="h-[400px] w-full relative">
-          {wordCloudData.length > 0 ? (
+          {cloudData.length > 0 ? (
             <div className="word-cloud-container">
               <WordCloud 
-                words={wordCloudData} 
+                words={cloudData} 
                 width={1000} 
                 height={350} 
                 renderWord={animatedWordRenderer}
-                padding={2}
-                spiral="archimedean"
-                rotate={() => 0}
+                padding={1}
+                spiral="rectangular"
+                rotate={() => (Math.random() > 0.5 ? 0 : 90)}
                 font="Roboto, sans-serif"
                 fontSize={getFontSize}
                 fontWeight={getFontWeight}
