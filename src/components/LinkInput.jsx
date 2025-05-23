@@ -134,6 +134,22 @@ const LinkInput = ({ onEmbedChange }) => {
     }
   }, [platform, embedHtml, link]);
 
+  // Reddit widgets script loader (for blockquote)
+  useEffect(() => {
+    if ((platform === 'Reddit' || getPlatform(link) === 'Reddit') && embedHtml) {
+      if (!document.getElementById('reddit-embed-script')) {
+        const script = document.createElement('script');
+        script.src = 'https://embed.reddit.com/widgets.js';
+        script.async = true;
+        script.id = 'reddit-embed-script';
+        script.charset = 'UTF-8';
+        document.body.appendChild(script);
+      } else if (window.reddit && window.reddit.init) {
+        window.reddit.init();
+      }
+    }
+  }, [platform, embedHtml, link]);
+
   // Expand/collapse card on valid/invalid
   useEffect(() => {
     if (!link || error) setExpanded(false);
@@ -176,9 +192,10 @@ const LinkInput = ({ onEmbedChange }) => {
       {/* Embed Card (expandable) */}
       {expanded && embedHtml && !error && (
         <Card className="mt-4 dark:bg-gray-800 dark:border-gray-700">
-          <CardContent className="pt-6 flex justify-center">
+          <CardContent className="pt-6 flex justify-center items-center">
             {/* Render HTML for Twitter/Reddit, or styled iframe for YouTube */}
-            <span style={platform === 'YouTube' ? { maxWidth: 700, width: '100%', aspectRatio: '16/9', display: 'flex', justifyContent: 'center' } : { width: '100%' }}
+            <span
+              style={platform === 'YouTube' ? { maxWidth: 700, width: '100%', aspectRatio: '16/9', display: 'flex', justifyContent: 'center' } : { width: '100%', display: 'flex', justifyContent: 'center' }}
               dangerouslySetInnerHTML={{ __html: embedHtml }}
             />
           </CardContent>
