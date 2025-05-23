@@ -1,7 +1,6 @@
 // src/components/navBar.jsx
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
 import { Menu } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
 import NavLinkItem from "./NavLinkItem";
@@ -46,12 +45,6 @@ export default function NavBar() {
         {/* Theme & Avatar */}
         <div className="flex items-center gap-4">
           <ThemeToggle onThemeChange={setTheme} />
-          <Link to="/userProfile">
-            <Avatar>
-              <AvatarImage src="https://github.com/shadcn.png" />
-              <AvatarFallback>CN</AvatarFallback>
-            </Avatar>
-          </Link>
         </div>
       </nav>
 
