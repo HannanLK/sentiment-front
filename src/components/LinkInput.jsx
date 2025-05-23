@@ -32,6 +32,7 @@ const LinkInput = ({ onEmbedChange }) => {
   const [expanded, setExpanded] = useState(false);
   const debounceRef = useRef();
   const [loading, setLoading] = useState(false);
+  const [userSelectedPlatform, setUserSelectedPlatform] = useState(false);
 
   // Handle link input change
   const handleLinkChange = (e) => {
@@ -40,15 +41,25 @@ const LinkInput = ({ onEmbedChange }) => {
     setError(null);
     setEmbedHtml(null);
     setExpanded(false);
+    setUserSelectedPlatform(false); // Reset to auto-detect on new input
   };
 
   // Handle platform dropdown change
-  const handlePlatformChange = (e) => {
-    setPlatform(e.target.value);
+  const handlePlatformChange = (val) => {
+    setPlatform(val);
+    setUserSelectedPlatform(true);
     setError(null);
     setEmbedHtml(null);
     setExpanded(false);
   };
+
+  // Auto-detect platform from link if user hasn't manually selected
+  useEffect(() => {
+    if (!userSelectedPlatform) {
+      const detected = getPlatform(link) || '';
+      setPlatform(detected);
+    }
+  }, [link, userSelectedPlatform]);
 
   // Debounce input and fetch embed
   useEffect(() => {
