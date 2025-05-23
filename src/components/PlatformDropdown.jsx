@@ -1,49 +1,24 @@
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import { FaReddit, FaTwitter, FaYoutube } from 'react-icons/fa'; // Assuming react-icons is used
+import { FaReddit, FaTwitter, FaYoutube } from 'react-icons/fa';
 
-const PlatformDropdown = ({ platform }) => {
-  const renderPlatformIcon = (platformName) => {
-    switch (platformName) {
-      case 'Reddit':
-        return <FaReddit className="mr-2" />;
-      case 'Twitter':
-        return <FaTwitter className="mr-2" />;
-      case 'YouTube':
-        return <FaYoutube className="mr-2" />;
-      default:
-        return null;
-    }
-  };
+const platforms = [
+  { name: 'Twitter', icon: <FaTwitter className="mr-2" /> },
+  { name: 'Reddit', icon: <FaReddit className="mr-2" /> },
+  { name: 'YouTube', icon: <FaYoutube className="mr-2" /> },
+];
 
-  const renderPlatformName = (platformName) => {
-    switch (platformName) {
-      case 'Reddit':
-        return 'Reddit';
-      case 'Twitter':
-        return 'Twitter';
-      case 'YouTube':
-        return 'YouTube';
-      default:
-        return 'Select Platform';
-    }
-  };
-
+const PlatformDropdown = ({ platform, alwaysVisible }) => {
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline" className="flex items-center dark:border-gray-700 dark:text-gray-200 dark:bg-gray-800">
-          {platform ? renderPlatformIcon(platform) : null}
-          {renderPlatformName(platform)}
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className="dark:bg-gray-900 dark:border-gray-700">
-        {/* We might not need selectable items if it's auto-detected, but keeping the structure */}
-        {/* <DropdownMenuItem>Reddit</DropdownMenuItem>
-        <DropdownMenuItem>Twitter</DropdownMenuItem>
-        <DropdownMenuItem>YouTube</DropdownMenuItem> */}
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <div className="flex space-x-2">
+      {platforms.map((p) => (
+        <div
+          key={p.name}
+          className={`flex items-center px-2 py-1 rounded transition-colors duration-150 ${platform === p.name ? 'bg-blue-100 dark:bg-blue-900 border border-blue-400 dark:border-blue-600' : 'bg-gray-100 dark:bg-gray-700 border border-transparent'} ${alwaysVisible ? '' : 'opacity-50'}`}
+        >
+          {p.icon}
+          <span className="font-medium text-sm">{p.name}</span>
+        </div>
+      ))}
+    </div>
   );
 };
 
