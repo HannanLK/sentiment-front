@@ -1,24 +1,29 @@
 import { FaReddit, FaTwitter, FaYoutube } from 'react-icons/fa';
+import React from 'react';
 
 const platforms = [
-  { name: 'Twitter', icon: <FaTwitter className="mr-2" /> },
-  { name: 'Reddit', icon: <FaReddit className="mr-2" /> },
-  { name: 'YouTube', icon: <FaYoutube className="mr-2" /> },
+  { value: '', name: 'Auto-detect', icon: null },
+  { value: 'Twitter', name: 'Twitter', icon: <FaTwitter className="inline mr-2 align-middle" /> },
+  { value: 'Reddit', name: 'Reddit', icon: <FaReddit className="inline mr-2 align-middle" /> },
+  { value: 'YouTube', name: 'YouTube', icon: <FaYoutube className="inline mr-2 align-middle" /> },
 ];
 
-const PlatformDropdown = ({ platform, alwaysVisible }) => {
+const PlatformDropdown = ({ value, onChange, disabled }) => {
   return (
-    <div className="flex space-x-2">
+    <select
+      value={value || ''}
+      onChange={onChange}
+      disabled={disabled}
+      className="h-9 rounded-md border border-input bg-background px-2 py-1 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700"
+      aria-label="Select platform"
+      style={{ minWidth: 120 }}
+    >
       {platforms.map((p) => (
-        <div
-          key={p.name}
-          className={`flex items-center px-2 py-1 rounded transition-colors duration-150 ${platform === p.name ? 'bg-blue-100 dark:bg-blue-900 border border-blue-400 dark:border-blue-600' : 'bg-gray-100 dark:bg-gray-700 border border-transparent'} ${alwaysVisible ? '' : 'opacity-50'}`}
-        >
-          {p.icon}
-          <span className="font-medium text-sm">{p.name}</span>
-        </div>
+        <option key={p.value} value={p.value}>
+          {p.name}
+        </option>
       ))}
-    </div>
+    </select>
   );
 };
 
