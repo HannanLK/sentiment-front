@@ -24,7 +24,7 @@ const getYouTubeId = (url) => {
   return match ? match[1] : null;
 };
 
-const LinkInput = ({ onEmbedChange }) => {
+const LinkInput = ({ onEmbedChange, onAnalyze }) => {
   const [link, setLink] = useState('');
   const [platform, setPlatform] = useState(''); // '' means auto-detect
   const [embedHtml, setEmbedHtml] = useState(null);
@@ -189,8 +189,7 @@ const LinkInput = ({ onEmbedChange }) => {
           type="button"
           className="sm:ml-2 mt-2 sm:mt-0 w-full sm:w-auto h-10 px-4 font-semibold text-lg tracking-wider flex items-center justify-center"
           onClick={() => {
-            // Optionally trigger analysis here
-            // You may want to lift state up for actual analysis
+            if (onAnalyze) onAnalyze();
           }}
           disabled={!link || !!error || loading}
         >
