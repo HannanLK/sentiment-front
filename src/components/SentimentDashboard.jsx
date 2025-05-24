@@ -184,7 +184,10 @@ export default function SentimentDashboard({ analysis, platform }) {
                   <div>
                     <span className="font-medium">Top Comment:</span>
                     <div className="mt-2">
-                      <span className="italic block max-h-56 min-h-[96px] overflow-y-auto p-2 bg-gray-50 dark:bg-gray-900 rounded border border-gray-200 dark:border-gray-700 whitespace-pre-line">
+                      <span
+                        className="italic block max-h-56 min-h-[96px] overflow-y-auto p-2 bg-gray-50 dark:bg-gray-900 rounded border border-gray-200 dark:border-gray-700 whitespace-pre-line"
+                        style={{ maxHeight: 224, minHeight: 96, overflowY: 'auto', display: 'block' }}
+                      >
                         {analysis.overall.unique_comment}
                       </span>
                     </div>
