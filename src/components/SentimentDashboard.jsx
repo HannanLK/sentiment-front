@@ -4,18 +4,26 @@ import { Progress } from '@/components/ui/progress';
 import { RadarChart } from '@/components/RadarChart';
 import { PieChart } from '@/components/PieChart';
 import { SentimentWordCloud } from '@/components/WordCloud';
+import { Badge } from '@/components/ui/badge';
 
-const gradient = (sentiment) => {
-  if (sentiment === 'positive') return 'bg-gradient-to-r from-green-400 to-green-600';
-  if (sentiment === 'neutral') return 'bg-gradient-to-r from-yellow-300 to-yellow-500';
-  if (sentiment === 'negative') return 'bg-gradient-to-r from-red-400 to-red-600';
+const sentimentColor = (sentiment) => {
+  if (sentiment === 'positive') return 'bg-green-500 text-white';
+  if (sentiment === 'neutral') return 'bg-yellow-400 text-black';
+  if (sentiment === 'negative') return 'bg-red-500 text-white';
+  return 'bg-gray-300 text-black';
+};
+
+const progressColor = (sentiment) => {
+  if (sentiment === 'positive') return 'bg-green-400';
+  if (sentiment === 'neutral') return 'bg-yellow-300';
+  if (sentiment === 'negative') return 'bg-red-400';
   return 'bg-gray-300';
 };
 
-const confidenceGradient = (label) => {
-  if (label === 'high') return 'bg-gradient-to-r from-blue-400 to-blue-700';
-  if (label === 'moderate') return 'bg-gradient-to-r from-blue-200 to-blue-400';
-  return 'bg-gradient-to-r from-gray-300 to-gray-400';
+const confidenceLabel = (label) => {
+  if (label === 'high') return <Badge className="bg-blue-500 text-white">High</Badge>;
+  if (label === 'moderate') return <Badge className="bg-blue-300 text-black">Moderate</Badge>;
+  return <Badge className="bg-gray-300 text-black">Low</Badge>;
 };
 
 export default function SentimentDashboard({ analysis, platform }) {
@@ -32,22 +40,41 @@ export default function SentimentDashboard({ analysis, platform }) {
         {/* Card 1: Overall Sentiment */}
         <Card>
           <CardHeader>
-            <CardTitle>Overall Analysis</CardTitle>
+            <CardTitle>Sentiment Analysis</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div>
-              <div className="mb-2 font-medium">Overall Sentiment: <span className="capitalize">{overall_sentiment}</span></div>
-              <Progress value={Math.abs(overall_score) * 100} className={gradient(overall_sentiment) + ' h-3'} />
+            <div className="flex items-center justify-between mb-2">
+              <span className="font-medium">Overall Sentiment</span>
+              <Badge className={sentimentColor(overall_sentiment)}>{overall_sentiment.charAt(0).toUpperCase() + overall_sentiment.slice(1)}</Badge>
             </div>
-            <div>
-              <div className="mb-2 font-medium">Emotion Distribution</div>
-              <Progress value={emotion_distribution.positive * 100} className="bg-green-200 h-2 mb-1" />
-              <Progress value={emotion_distribution.neutral * 100} className="bg-yellow-200 h-2 mb-1" />
-              <Progress value={emotion_distribution.negative * 100} className="bg-red-200 h-2" />
-              <div className="flex justify-between text-xs mt-1">
-                <span>Positive: {(emotion_distribution.positive * 100).toFixed(1)}%</span>
-                <span>Neutral: {(emotion_distribution.neutral * 100).toFixed(1)}%</span>
-                <span>Negative: {(emotion_distribution.negative * 100).toFixed(1)}%</span>
+            <div className="flex items-center gap-2">
+              <div className="flex-1 h-3 rounded-full bg-gray-200 overflow-hidden">
+                <div className={progressColor(overall_sentiment) + ' h-3 rounded-full transition-all duration-500'} style={{ width: `${Math.abs(overall_score) * 100}%` }} />
+              </div>
+              <span className={sentimentColor(overall_sentiment) + ' ml-2 px-2 py-0.5 rounded text-sm font-bold'}>{overall_score > 0 ? '+' : ''}{overall_score.toFixed(2)}</span>
+            </div>
+            <div className="mt-4">
+              <div className="mb-2 font-medium">Emotion Analysis</div>
+              <div className="flex items-center mb-1">
+                <span className="w-20">Positive</span>
+                <div className="flex-1 h-2 rounded-full bg-green-100 overflow-hidden mx-2">
+                  <div className="bg-green-400 h-2 rounded-full" style={{ width: `${emotion_distribution.positive * 100}%` }} />
+                </div>
+                <span className="w-12 text-right">{(emotion_distribution.positive * 100).toFixed(1)}%</span>
+              </div>
+              <div className="flex items-center mb-1">
+                <span className="w-20">Neutral</span>
+                <div className="flex-1 h-2 rounded-full bg-yellow-100 overflow-hidden mx-2">
+                  <div className="bg-yellow-300 h-2 rounded-full" style={{ width: `${emotion_distribution.neutral * 100}%` }} />
+                </div>
+                <span className="w-12 text-right">{(emotion_distribution.neutral * 100).toFixed(1)}%</span>
+              </div>
+              <div className="flex items-center">
+                <span className="w-20">Negative</span>
+                <div className="flex-1 h-2 rounded-full bg-red-100 overflow-hidden mx-2">
+                  <div className="bg-red-400 h-2 rounded-full" style={{ width: `${emotion_distribution.negative * 100}%` }} />
+                </div>
+                <span className="w-12 text-right">{(emotion_distribution.negative * 100).toFixed(1)}%</span>
               </div>
             </div>
           </CardContent>
@@ -75,10 +102,10 @@ export default function SentimentDashboard({ analysis, platform }) {
             <CardTitle>Key Insights</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            <div>Dominant Emotion: <span className="capitalize font-semibold">{dominant_emotion}</span></div>
-            <div>Emotional Intensity: {Math.max(sentiment_intensity.positive, sentiment_intensity.neutral, sentiment_intensity.negative).toFixed(2)}</div>
-            <div>Total Comments: {total_comments}</div>
-            <div>Unique Comment: <span className="italic">{unique_comment}</span></div>
+            <div><span className="font-medium">Dominant Emotion:</span> <Badge className={sentimentColor(dominant_emotion)}>{dominant_emotion.charAt(0).toUpperCase() + dominant_emotion.slice(1)}</Badge></div>
+            <div><span className="font-medium">Emotional Intensity:</span> {Math.max(sentiment_intensity.positive, sentiment_intensity.neutral, sentiment_intensity.negative).toFixed(2)}</div>
+            <div><span className="font-medium">Total Comments:</span> {total_comments}</div>
+            <div><span className="font-medium">Top Comment:</span> <span className="italic">{unique_comment}</span></div>
           </CardContent>
         </Card>
         {/* Card 4: Model Confidence */}
@@ -87,8 +114,9 @@ export default function SentimentDashboard({ analysis, platform }) {
             <CardTitle>Model Confidence</CardTitle>
           </CardHeader>
           <CardContent>
-            <Progress value={model_confidence.value * 100} className={confidenceGradient(model_confidence.label) + ' h-3'} />
-            <div className="mt-2 text-sm">{model_confidence.label.charAt(0).toUpperCase() + model_confidence.label.slice(1)} confidence ({(model_confidence.value * 100).toFixed(1)}%)</div>
+            {confidenceLabel(model_confidence.label)}
+            <Progress value={model_confidence.value * 100} className="h-3 mt-2 bg-blue-100" />
+            <div className="mt-2 text-sm">{(model_confidence.value * 100).toFixed(1)}%</div>
           </CardContent>
         </Card>
       </div>
