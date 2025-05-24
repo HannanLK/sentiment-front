@@ -8,7 +8,6 @@ import MobileMenu from "./MobileMenu";
 
 export default function NavBar() {
   const location = useLocation();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [theme, setTheme] = useState("light");
 
   useEffect(() => {
@@ -25,19 +24,14 @@ export default function NavBar() {
         }`}
       >
         <div className="flex items-center gap-4">
-          {/* Mobile Menu Icon */}
-          <div className="md:hidden cursor-pointer" onClick={() => setIsMobileMenuOpen(true)}>
-            <Menu size={24} />
-          </div>
-
           {/* Logo */}
           <Link to="/" className="font-logo text-2xl font-bold">
             VibeCheck
           </Link>
         </div>
 
-        {/* Nav Links */}
-        <div className="hidden md:flex gap-10 tracking-wider font-roboto text-lg font-normal">
+        {/* Nav Links - only show on desktop */}
+        <div className="hidden sm:flex gap-10 tracking-wider font-roboto text-lg font-normal">
           <NavLinkItem to="/textSentiment" label="Text Analyzer" activePath={location.pathname} />
           <NavLinkItem to="/socialSentiment" label="Social Media" activePath={location.pathname} />
         </div>
@@ -47,8 +41,6 @@ export default function NavBar() {
           <ThemeToggle onThemeChange={setTheme} />
         </div>
       </nav>
-
-      <MobileMenu isOpen={isMobileMenuOpen} setIsOpen={setIsMobileMenuOpen} />
     </>
   );
 }
