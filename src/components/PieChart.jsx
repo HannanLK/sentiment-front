@@ -14,11 +14,11 @@ import { TrendingUp } from "lucide-react"
 import { Skeleton } from "./ui/skeleton"
 
 const COLORS = [
-  "hsl(var(--chart-1))",
-  "hsl(var(--chart-2))",
-  "hsl(var(--chart-3))",
-  "hsl(var(--chart-4))",
-  "hsl(var(--chart-5))"
+  '#2563eb', // blue
+  '#10b981', // green
+  '#f59e42', // orange
+  '#f43f5e', // red
+  '#a21caf', // purple
 ]
 
 export function PieChart({

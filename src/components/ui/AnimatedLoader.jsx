@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-export default function AnimatedLoader({ ready, onDone, minWait = 5000 }) {
+export default function AnimatedLoader({ ready, onDone, minWait = 5000, speed = 1 }) {
   const [progress, setProgress] = useState(0);
   const [startTime] = useState(Date.now());
   const [done, setDone] = useState(false);
@@ -8,7 +8,9 @@ export default function AnimatedLoader({ ready, onDone, minWait = 5000 }) {
   useEffect(() => {
     if (done) return;
     if (progress < 99 && !ready) {
-      const timeout = setTimeout(() => setProgress(p => Math.min(p + 2, 99)), 30);
+      // Simulate a slower, more natural progress curve
+      const increment = progress < 70 ? 1 * speed : progress < 90 ? 0.5 * speed : 0.2 * speed;
+      const timeout = setTimeout(() => setProgress(p => Math.min(p + increment, 99)), 50);
       return () => clearTimeout(timeout);
     } else if (ready && progress < 100) {
       // Wait for minWait
@@ -19,7 +21,7 @@ export default function AnimatedLoader({ ready, onDone, minWait = 5000 }) {
       setDone(true);
       setTimeout(() => onDone && onDone(), 400); // small delay for smoothness
     }
-  }, [progress, ready, onDone, minWait, startTime, done]);
+  }, [progress, ready, onDone, minWait, startTime, done, speed]);
 
   return (
     <div className="flex flex-col items-center justify-center h-[400px] w-full rounded-xl bg-accent/40 dark:bg-accent/10 relative overflow-hidden">
@@ -34,7 +36,7 @@ export default function AnimatedLoader({ ready, onDone, minWait = 5000 }) {
         <div className="w-2/3 h-4 bg-gray-300 dark:bg-gray-700 rounded-full overflow-hidden mt-8">
           <div className="h-full bg-blue-400 transition-all duration-200" style={{ width: `${progress}%` }} />
         </div>
-        <div className="mt-2 text-sm text-gray-500 dark:text-gray-300">{progress}%</div>
+        <div className="mt-2 text-sm text-gray-500 dark:text-gray-300">{Math.round(progress)}%</div>
       </div>
       <style>{`
         .dot-animate::after {

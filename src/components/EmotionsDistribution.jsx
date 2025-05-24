@@ -34,12 +34,12 @@ export function EmotionsDistribution({ emotionScores }) {
           value={chartType}
           onValueChange={setChartType}
         >
-          <SelectTrigger className="w-[180px]">
+          <SelectTrigger className="w-[180px] dark:bg-gray-800 dark:text-gray-200 bg-white text-gray-900 border border-gray-300">
             <SelectValue placeholder="Select chart type" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200 border border-gray-300 dark:border-gray-700">
             {chartOptions.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
+              <SelectItem key={option.value} value={option.value} className="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200">
                 {option.label}
               </SelectItem>
             ))}
@@ -48,7 +48,7 @@ export function EmotionsDistribution({ emotionScores }) {
       </CardHeader>
       <CardContent>
         {chartType === 'radar' ? (
-          <RadarChart data={emotionScores} />
+          <RadarChart data={emotionScores} color="#2563eb" />
         ) : (
           <PieChart data={emotionScores} showLabels={true} />
         )}

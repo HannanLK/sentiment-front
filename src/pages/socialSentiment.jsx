@@ -16,6 +16,30 @@ function SocialSentiment() {
   const { toast } = useToast();
   const { analysis, setAnalysis } = useAnalysis();
 
+  // Load analysis from localStorage on mount and set context
+  useEffect(() => {
+    const saved = localStorage.getItem('socialSentimentAnalysis');
+    if (saved) {
+      setAnalysis(JSON.parse(saved));
+    }
+  }, [setAnalysis]);
+
+  // Save analysis to localStorage whenever it changes
+  useEffect(() => {
+    if (analysis) {
+      localStorage.setItem('socialSentimentAnalysis', JSON.stringify(analysis));
+    }
+  }, [analysis]);
+
+  // Only clear analysis from localStorage when link is removed or on refresh
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      localStorage.removeItem('socialSentimentAnalysis');
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, []);
+
   // Called by LinkInput when a valid embed is fetched or cleared
   const handleEmbedChange = (embed) => {
     setEmbedData(embed);
@@ -23,6 +47,8 @@ function SocialSentiment() {
     setError(null);
     setApiReady(false);
     setShowDashboard(false);
+    setLoading(false); // Ensure loader is not shown on link entry
+    localStorage.removeItem('socialSentimentAnalysis');
   };
 
   // Called on Analyze click
@@ -118,10 +144,13 @@ function SocialSentiment() {
 
         {/* Content Area */}
         <div ref={dashboardRef}>
+          {/* Only show WelcomeMessage or embed preview after link entry, not loader/analysis */}
           {!embedData || embedData.error ? (
             <WelcomeMessage />
           ) : loading || (!showDashboard && !error && !analysis) ? (
-            <AnimatedLoader ready={apiReady} onDone={handleLoaderDone} minWait={5000} />
+            loading ? (
+              <AnimatedLoader ready={apiReady} onDone={handleLoaderDone} minWait={5000} />
+            ) : null
           ) : error ? (
             <div className="text-red-500 text-lg font-semibold p-6">{error}</div>
           ) : showDashboard && analysis ? (

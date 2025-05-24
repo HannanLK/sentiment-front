@@ -14,6 +14,12 @@ A modern React-based frontend for text and social media sentiment analysis, buil
   - Engagement analytics
   - Trend visualization
   - Cross-platform comparison
+  - Platform-specific sentiment tracking
+  - YouTube dashboard with integrated key insights and model confidence
+  - Improved dark/light mode label visibility
+  - Analysis persists across navigation
+  - Trend visualization
+  - Cross-platform comparison
 - Modern UI/UX
   - Dark/Light mode support
   - Responsive design
