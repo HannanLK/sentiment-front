@@ -4,13 +4,12 @@ import { NavLink, useLocation } from 'react-router-dom';
 
 export default function BottomNavBar() {
   const location = useLocation();
-  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 640;
 
   return (
     <>
-      {/* Desktop Bottom Bar */}
+      {/* Desktop Bottom Bar (not fixed) */}
       <footer
-        className="hidden sm:flex fixed bottom-0 left-0 w-full z-50 items-center justify-between px-4 py-2 bg-black text-gray-200 text-sm"
+        className="hidden sm:flex w-full items-center justify-between px-4 py-2 bg-black text-gray-200 text-sm"
         style={{ minHeight: 40, borderTop: '1px solid #222' }}
       >
         <div className="flex items-center gap-2">
@@ -47,7 +46,7 @@ export default function BottomNavBar() {
         </div>
       </footer>
 
-      {/* Mobile Bottom Nav */}
+      {/* Mobile Bottom Nav (fixed) */}
       <nav className="sm:hidden fixed bottom-0 left-0 w-full z-50 bg-black border-t border-gray-800 flex justify-around items-center py-1" style={{ minHeight: 48 }}>
         <NavLink
           to="/textSentiment"

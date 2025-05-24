@@ -20,6 +20,7 @@ import { api } from "@/lib/api"
 import { EmotionsDistribution } from "../components/EmotionsDistribution"
 import { SentimentWordCloud } from "../components/WordCloud"
 import { TextStyleEnhancement } from "../components/TextStyleEnhancement"
+import BottomNavBar from "../components/BottomNavBar"
 
 // Simple Error Boundary Component
 class ErrorBoundary extends React.Component {
@@ -268,188 +269,191 @@ export default function TextSentiment() {
   }
 
   return (
-    <div className="container mx-auto p-4 sm:p-6">
-      <div className="max-w-4xl mx-auto space-y-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Sparkles className="h-5 w-5" />
-              Text Sentiment Analysis
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <Textarea
-                ref={textareaRef}
-                value={text}
-                onChange={(e) => setText(e.target.value)}
-                placeholder="Type or paste your text here..."
-                className="min-h-[200px] resize-none font-roboto text-base"
-              />
-              <div className="flex flex-col sm:flex-row gap-4">
-                <div className="flex-1">
-                  <input
-                    type="file"
-                    accept=".txt,.md,.doc,.docx"
-                    onChange={(e) => e.target.files[0] && handleFileUpload(e.target.files[0])}
-                    className="hidden"
-                    id="file-upload"
-                  />
-                  <label
-                    htmlFor="file-upload"
-                    className="inline-flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 cursor-pointer"
-                  >
-                    <FileText className="w-4 h-4 mr-2" />
-                    Upload File
-                  </label>
-                </div>
-                <div className="flex gap-2">
-                  <Button
-                    onClick={handleAnalyze}
-                    disabled={loading || !text.trim()}
-                    className="flex-1 sm:flex-none"
-                  >
-                    {loading ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Analyzing...
-                      </>
-                    ) : (
-                      <>
-                        <BarChart2 className="mr-2 h-4 w-4" />
-                        Analyze
-                      </>
-                    )}
-                  </Button>
-                  <Button
-                    onClick={handleClear}
-                    variant="outline"
-                    className="flex-1 sm:flex-none"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+    <div className="min-h-screen flex flex-col">
+      <div className="container mx-auto p-4 sm:p-6 flex-1 flex flex-col">
+        <div className="max-w-4xl mx-auto space-y-6 flex-1 flex flex-col">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Sparkles className="h-5 w-5" />
+                Text Sentiment Analysis
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <Textarea
+                  ref={textareaRef}
+                  value={text}
+                  onChange={(e) => setText(e.target.value)}
+                  placeholder="Type or paste your text here..."
+                  className="min-h-[200px] resize-none font-roboto text-base"
+                />
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <div className="flex-1">
+                    <input
+                      type="file"
+                      accept=".txt,.md,.doc,.docx"
+                      onChange={(e) => e.target.files[0] && handleFileUpload(e.target.files[0])}
+                      className="hidden"
+                      id="file-upload"
+                    />
+                    <label
+                      htmlFor="file-upload"
+                      className="inline-flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 cursor-pointer"
+                    >
+                      <FileText className="w-4 h-4 mr-2" />
+                      Upload File
+                    </label>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={handleAnalyze}
+                      disabled={loading || !text.trim()}
+                      className="flex-1 sm:flex-none"
+                    >
+                      {loading ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Analyzing...
+                        </>
+                      ) : (
+                        <>
+                          <BarChart2 className="mr-2 h-4 w-4" />
+                          Analyze
+                        </>
+                      )}
+                    </Button>
+                    <Button
+                      onClick={handleClear}
+                      variant="outline"
+                      className="flex-1 sm:flex-none"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
 
-        {error && (
-          <Alert variant="destructive">
-            <AlertCircle className="h-4 w-4" />
-            <AlertTitle>Error</AlertTitle>
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
+          {error && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Error</AlertTitle>
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
 
-        {!analysis && !loading && <WelcomeMessage />}
+          {!analysis && !loading && <WelcomeMessage />}
 
-        {loading ? (
-          <div className="space-y-4">
-            <Card>
-              <CardContent className="pt-6">
-                <div className="space-y-4">
-                  <div className="h-4 bg-gray-200 rounded animate-pulse" />
-                  <div className="h-4 bg-gray-200 rounded animate-pulse w-3/4" />
-                  <div className="h-4 bg-gray-200 rounded animate-pulse w-1/2" />
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        ) : analysis && (
-          <div className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {loading ? (
+            <div className="space-y-4">
               <Card>
-                <CardHeader>
-                  <CardTitle>Sentiment Analysis</CardTitle>
-                </CardHeader>
-                <CardContent>
+                <CardContent className="pt-6">
                   <div className="space-y-4">
-                    <div>
-                      <div className="flex justify-between items-center mb-2">
-                        <p className="text-sm font-medium">Overall Sentiment</p>
-                        <Badge variant={analysis.sentiment_score > 0.3 ? "default" : analysis.sentiment_score < -0.3 ? "destructive" : "secondary"}>
-                          {getSentimentLabel(analysis.sentiment_score)}
+                    <div className="h-4 bg-gray-200 rounded animate-pulse" />
+                    <div className="h-4 bg-gray-200 rounded animate-pulse w-3/4" />
+                    <div className="h-4 bg-gray-200 rounded animate-pulse w-1/2" />
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          ) : analysis && (
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Sentiment Analysis</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div>
+                        <div className="flex justify-between items-center mb-2">
+                          <p className="text-sm font-medium">Overall Sentiment</p>
+                          <Badge variant={analysis.sentiment_score > 0.3 ? "default" : analysis.sentiment_score < -0.3 ? "destructive" : "secondary"}>
+                            {getSentimentLabel(analysis.sentiment_score)}
+                          </Badge>
+                        </div>
+                        <div className="flex items-center gap-4">
+                          <Progress
+                            value={(analysis.sentiment_score + 1) * 50}
+                            className="flex-1"
+                            style={{ backgroundImage: getProgressBarColor(analysis.sentiment_score) }}
+                          />
+                          <span className={`font-bold ${getSentimentColor(analysis.sentiment_score)}`}>
+                            {analysis.sentiment_score.toFixed(2)}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="space-y-4">
+                        <h3 className="text-lg font-semibold">Emotion Analysis</h3>
+                        {analysis?.emotion_scores && Object.entries(analysis.emotion_scores).map(([emotion, score]) => (
+                          <div key={emotion} className="space-y-2">
+                            <div className="flex justify-between text-sm">
+                              <span className="capitalize">{emotion}</span>
+                              <span>{(score * 100).toFixed(1)}%</span>
+                            </div>
+                            <div className="h-2 bg-secondary rounded-full overflow-hidden">
+                              <div
+                                className="h-full bg-primary transition-all duration-500"
+                                style={{ width: `${score * 100}%` }}
+                              />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <EmotionsDistribution emotionScores={analysis.emotion_scores} />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Key Insights</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-sm font-medium mb-2">Dominant Emotion</p>
+                        <Badge variant="secondary" className="capitalize">
+                          {Object.entries(analysis.emotion_scores).reduce((a, b) =>
+                            a[1] > b[1] ? a : b
+                          )[0]}
                         </Badge>
                       </div>
-                      <div className="flex items-center gap-4">
-                        <Progress
-                          value={(analysis.sentiment_score + 1) * 50}
-                          className="flex-1"
-                          style={{ backgroundImage: getProgressBarColor(analysis.sentiment_score) }}
-                        />
-                        <span className={`font-bold ${getSentimentColor(analysis.sentiment_score)}`}>
-                          {analysis.sentiment_score.toFixed(2)}
-                        </span>
+                      <div>
+                        <p className="text-sm font-medium mb-2">Emotional Intensity</p>
+                        <Badge variant={Object.values(analysis.emotion_scores).reduce((a, b) => a + b, 0) / 
+                          Object.keys(analysis.emotion_scores).length > 0.5 ? "default" : "secondary"}>
+                          {Object.values(analysis.emotion_scores).reduce((a, b) => a + b, 0) / 
+                           Object.keys(analysis.emotion_scores).length > 0.5
+                            ? "High"
+                            : "Moderate"}
+                        </Badge>
                       </div>
                     </div>
+                  </CardContent>
+                </Card>
 
-                    <div className="space-y-4">
-                      <h3 className="text-lg font-semibold">Emotion Analysis</h3>
-                      {analysis?.emotion_scores && Object.entries(analysis.emotion_scores).map(([emotion, score]) => (
-                        <div key={emotion} className="space-y-2">
-                          <div className="flex justify-between text-sm">
-                            <span className="capitalize">{emotion}</span>
-                            <span>{(score * 100).toFixed(1)}%</span>
-                          </div>
-                          <div className="h-2 bg-secondary rounded-full overflow-hidden">
-                            <div
-                              className="h-full bg-primary transition-all duration-500"
-                              style={{ width: `${score * 100}%` }}
-                            />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+                <ModelConfidence confidenceScore={analysis?.confidence_score ?? 0} />
+              </div>
 
-              <EmotionsDistribution emotionScores={analysis.emotion_scores} />
+              <SentimentWordCloud 
+                words={analysis.unique_words}
+                frequencies={analysis.word_frequencies}
+                sentimentScores={analysis.word_sentiment_scores}
+              />
+
+              <TextStyleEnhancement originalText={text} />
             </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Key Insights</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <p className="text-sm font-medium mb-2">Dominant Emotion</p>
-                      <Badge variant="secondary" className="capitalize">
-                        {Object.entries(analysis.emotion_scores).reduce((a, b) =>
-                          a[1] > b[1] ? a : b
-                        )[0]}
-                      </Badge>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium mb-2">Emotional Intensity</p>
-                      <Badge variant={Object.values(analysis.emotion_scores).reduce((a, b) => a + b, 0) / 
-                        Object.keys(analysis.emotion_scores).length > 0.5 ? "default" : "secondary"}>
-                        {Object.values(analysis.emotion_scores).reduce((a, b) => a + b, 0) / 
-                         Object.keys(analysis.emotion_scores).length > 0.5
-                          ? "High"
-                          : "Moderate"}
-                      </Badge>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <ModelConfidence confidenceScore={analysis?.confidence_score ?? 0} />
-            </div>
-
-            <SentimentWordCloud 
-              words={analysis.unique_words}
-              frequencies={analysis.word_frequencies}
-              sentimentScores={analysis.word_sentiment_scores}
-            />
-
-            <TextStyleEnhancement originalText={text} />
-          </div>
-        )}
+          )}
+        </div>
       </div>
+      <BottomNavBar />
     </div>
   )
 }

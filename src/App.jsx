@@ -6,7 +6,6 @@ import { Toaster } from "sonner";
 import NavBar from "./components/navBar";
 import TextSentiment from "./pages/textSentiment.jsx";
 import SocialSentiment from "./pages/socialSentiment.jsx";
-import BottomNavBar from "./components/BottomNavBar";
 
 function App() {
   useEffect(() => {
@@ -31,7 +30,6 @@ function App() {
           <Route path="/textSentiment" element={<TextSentiment />} />
           <Route path="/socialSentiment" element={<SocialSentiment />} />
         </Routes>
-        <BottomNavBar />
       </div>
     </BrowserRouter>
   );
