@@ -20,11 +20,148 @@ const confidenceColor = (label, isDark) => {
 };
 
 export default function SentimentDashboard({ analysis, platform }) {
-  const [chartType, setChartType] = useState('radar');
-  const { overall_sentiment, overall_score, emotion_distribution, sentiment_intensity, dominant_emotion, total_comments, unique_comment, model_confidence, wordcloud } = analysis;
+  // Detect if this is a new SocialAnalysisResult (Reddit/Twitter)
+  const isSocial = analysis && analysis.post && analysis.comments && analysis.overall;
+  const [chartTypeOverall, setChartTypeOverall] = useState('radar');
+  const [chartTypePost, setChartTypePost] = useState('radar');
+  const [chartTypeComments, setChartTypeComments] = useState('radar');
   const isDark = typeof window !== 'undefined' && document.documentElement.classList.contains('dark');
 
-  if (!emotion_distribution) {
+  // Helper to render a sentiment card (for overall, post, comments)
+  const renderSentimentCard = (data, title, chartType, setChartType) => (
+    <div className="flex flex-col md:flex-row gap-4 w-full">
+      <div className="flex-1 space-y-4 min-w-0">
+        <Card className="h-full">
+          <CardHeader>
+            <CardTitle>{title}</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between mb-2">
+              <span className="font-medium">Overall Sentiment</span>
+              <Badge className={sentimentColor(data.overall_sentiment, isDark)}>
+                {data.overall_sentiment.charAt(0).toUpperCase() + data.overall_sentiment.slice(1)}
+              </Badge>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="flex-1 h-3 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
+                <div className={sentimentColor(data.overall_sentiment, isDark) + ' h-3 rounded-full transition-all duration-500'} style={{ width: `${Math.abs(data.overall_score) * 100}%` }} />
+              </div>
+              <span className={sentimentColor(data.overall_sentiment, isDark) + ' ml-2 px-2 py-0.5 rounded text-sm font-bold'}>
+                {data.overall_score > 0 ? '+' : ''}{data.overall_score.toFixed(2)}
+              </span>
+            </div>
+            {/* Emotion Analysis Bars */}
+            <div className="mt-4">
+              <div className="mb-2 font-medium">Emotion Analysis</div>
+              <div className="flex items-center mb-1">
+                <span className="w-20">Positive</span>
+                <div className="flex-1 h-2 rounded-full bg-green-100 dark:bg-green-900 overflow-hidden mx-2">
+                  <div className="bg-green-400 h-2 rounded-full" style={{ width: `${data.emotion_distribution.positive * 100}%` }} />
+                </div>
+                <span className="w-12 text-right">{(data.emotion_distribution.positive * 100).toFixed(1)}%</span>
+              </div>
+              <div className="flex items-center mb-1">
+                <span className="w-20">Neutral</span>
+                <div className="flex-1 h-2 rounded-full bg-yellow-100 dark:bg-yellow-900 overflow-hidden mx-2">
+                  <div className="bg-yellow-300 h-2 rounded-full" style={{ width: `${data.emotion_distribution.neutral * 100}%` }} />
+                </div>
+                <span className="w-12 text-right">{(data.emotion_distribution.neutral * 100).toFixed(1)}%</span>
+              </div>
+              <div className="flex items-center">
+                <span className="w-20">Negative</span>
+                <div className="flex-1 h-2 rounded-full bg-red-100 dark:bg-red-900 overflow-hidden mx-2">
+                  <div className="bg-red-400 h-2 rounded-full" style={{ width: `${data.emotion_distribution.negative * 100}%` }} />
+                </div>
+                <span className="w-12 text-right">{(data.emotion_distribution.negative * 100).toFixed(1)}%</span>
+              </div>
+            </div>
+            {/* Key Insights Section */}
+            <div className="mt-6 space-y-2">
+              <div>
+                <span className="font-medium">Dominant Emotion:</span>{' '}
+                <Badge className={sentimentColor(data.dominant_emotion, isDark)}>
+                  {data.dominant_emotion.charAt(0).toUpperCase() + data.dominant_emotion.slice(1)}
+                </Badge>
+              </div>
+              <div>
+                <span className="font-medium">Emotional Intensity:</span>{' '}
+                {Math.max(data.sentiment_intensity.positive, data.sentiment_intensity.neutral, data.sentiment_intensity.negative).toFixed(2)}
+              </div>
+              <div>
+                <span className="font-medium">Fetched Comments:</span>{' '}
+                {data.total_comments}
+              </div>
+              <div>
+                <span className="font-medium">Top Comment:</span>{' '}
+                <span className="italic block max-h-24 overflow-y-auto p-2 bg-gray-50 dark:bg-gray-900 rounded border border-gray-200 dark:border-gray-700 whitespace-pre-line">
+                  {data.unique_comment}
+                </span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+      {/* Chart Card */}
+      <div className="flex-1 min-w-0">
+        <Card className="h-full">
+          <CardHeader>
+            <CardTitle>Emotion Distribution</CardTitle>
+            <select value={chartType} onChange={e => setChartType(e.target.value)} className="ml-auto rounded border px-2 py-1 text-sm">
+              <option value="radar">Radar</option>
+              <option value="pie">Pie</option>
+            </select>
+          </CardHeader>
+          <CardContent>
+            {chartType === 'radar' ? (
+              <RadarChart data={data.emotion_distribution} color="#2563eb" />
+            ) : (
+              <PieChart data={data.emotion_distribution} />
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+
+  // Social (Reddit/Twitter) layout
+  if (isSocial && (platform === 'Reddit' || platform === 'Twitter')) {
+    return (
+      <div className="space-y-6">
+        {/* Row 1: Overall (POST + COMMENTS) */}
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+          <div className="md:col-span-3 col-span-1">{renderSentimentCard(analysis.overall, 'Overall Sentiment (Post + Comments)', chartTypeOverall, setChartTypeOverall)}</div>
+          <div className="md:col-span-2 col-span-1 flex flex-col justify-stretch">{/* Chart only, already included in card */}</div>
+        </div>
+        {/* Row 2: Post and Comments side by side */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {renderSentimentCard(analysis.post, 'Post Sentiment', chartTypePost, setChartTypePost)}
+          {renderSentimentCard(analysis.comments, 'Comments Sentiment', chartTypeComments, setChartTypeComments)}
+        </div>
+        {/* Row 3: Model Confidence (from overall) */}
+        <div className="grid grid-cols-1">
+          <Card>
+            <CardHeader>
+              <CardTitle>Model Confidence</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center gap-4">
+                <Progress value={analysis.overall.model_confidence.value * 100} className="flex-1 h-3 bg-blue-100 dark:bg-blue-900" style={{ backgroundImage: 'linear-gradient(to right, #3B82F6, #60A5FA)' }} />
+                <Badge className={confidenceColor(analysis.overall.model_confidence.label, isDark)}>
+                  {analysis.overall.model_confidence.label.charAt(0).toUpperCase() + analysis.overall.model_confidence.label.slice(1)}
+                </Badge>
+                <span className="ml-2 text-sm">{(analysis.overall.model_confidence.value * 100).toFixed(1)}%</span>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+        {/* Word Cloud (if available) */}
+        {analysis.overall.wordcloud && <div className="mt-6"><SentimentWordCloud frequencies={analysis.overall.wordcloud} /></div>}
+      </div>
+    );
+  }
+
+  // Default (YouTube/legacy) layout
+  if (!analysis.emotion_distribution) {
     return <div>No sentiment data available.</div>;
   }
 
@@ -40,16 +177,16 @@ export default function SentimentDashboard({ analysis, platform }) {
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between mb-2">
               <span className="font-medium">Overall Sentiment</span>
-              <Badge className={sentimentColor(overall_sentiment, isDark)}>
-                {overall_sentiment.charAt(0).toUpperCase() + overall_sentiment.slice(1)}
+              <Badge className={sentimentColor(analysis.overall_sentiment, isDark)}>
+                {analysis.overall_sentiment.charAt(0).toUpperCase() + analysis.overall_sentiment.slice(1)}
               </Badge>
             </div>
             <div className="flex items-center gap-2">
               <div className="flex-1 h-3 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
-                <div className={sentimentColor(overall_sentiment, isDark) + ' h-3 rounded-full transition-all duration-500'} style={{ width: `${Math.abs(overall_score) * 100}%` }} />
+                <div className={sentimentColor(analysis.overall_sentiment, isDark) + ' h-3 rounded-full transition-all duration-500'} style={{ width: `${Math.abs(analysis.overall_score) * 100}%` }} />
               </div>
-              <span className={sentimentColor(overall_sentiment, isDark) + ' ml-2 px-2 py-0.5 rounded text-sm font-bold'}>
-                {overall_score > 0 ? '+' : ''}{overall_score.toFixed(2)}
+              <span className={sentimentColor(analysis.overall_sentiment, isDark) + ' ml-2 px-2 py-0.5 rounded text-sm font-bold'}>
+                {analysis.overall_score > 0 ? '+' : ''}{analysis.overall_score.toFixed(2)}
               </span>
             </div>
             {/* Emotion Analysis Bars */}
@@ -58,46 +195,46 @@ export default function SentimentDashboard({ analysis, platform }) {
               <div className="flex items-center mb-1">
                 <span className="w-20">Positive</span>
                 <div className="flex-1 h-2 rounded-full bg-green-100 dark:bg-green-900 overflow-hidden mx-2">
-                  <div className="bg-green-400 h-2 rounded-full" style={{ width: `${emotion_distribution.positive * 100}%` }} />
+                  <div className="bg-green-400 h-2 rounded-full" style={{ width: `${analysis.emotion_distribution.positive * 100}%` }} />
                 </div>
-                <span className="w-12 text-right">{(emotion_distribution.positive * 100).toFixed(1)}%</span>
+                <span className="w-12 text-right">{(analysis.emotion_distribution.positive * 100).toFixed(1)}%</span>
               </div>
               <div className="flex items-center mb-1">
                 <span className="w-20">Neutral</span>
                 <div className="flex-1 h-2 rounded-full bg-yellow-100 dark:bg-yellow-900 overflow-hidden mx-2">
-                  <div className="bg-yellow-300 h-2 rounded-full" style={{ width: `${emotion_distribution.neutral * 100}%` }} />
+                  <div className="bg-yellow-300 h-2 rounded-full" style={{ width: `${analysis.emotion_distribution.neutral * 100}%` }} />
                 </div>
-                <span className="w-12 text-right">{(emotion_distribution.neutral * 100).toFixed(1)}%</span>
+                <span className="w-12 text-right">{(analysis.emotion_distribution.neutral * 100).toFixed(1)}%</span>
               </div>
               <div className="flex items-center">
                 <span className="w-20">Negative</span>
                 <div className="flex-1 h-2 rounded-full bg-red-100 dark:bg-red-900 overflow-hidden mx-2">
-                  <div className="bg-red-400 h-2 rounded-full" style={{ width: `${emotion_distribution.negative * 100}%` }} />
+                  <div className="bg-red-400 h-2 rounded-full" style={{ width: `${analysis.emotion_distribution.negative * 100}%` }} />
                 </div>
-                <span className="w-12 text-right">{(emotion_distribution.negative * 100).toFixed(1)}%</span>
+                <span className="w-12 text-right">{(analysis.emotion_distribution.negative * 100).toFixed(1)}%</span>
               </div>
             </div>
             {/* Key Insights Section */}
             <div className="mt-6 space-y-2">
               <div>
                 <span className="font-medium">Dominant Emotion:</span>{' '}
-                <Badge className={sentimentColor(dominant_emotion, isDark)}>
-                  {dominant_emotion.charAt(0).toUpperCase() + dominant_emotion.slice(1)}
+                <Badge className={sentimentColor(analysis.dominant_emotion, isDark)}>
+                  {analysis.dominant_emotion.charAt(0).toUpperCase() + analysis.dominant_emotion.slice(1)}
                 </Badge>
               </div>
               <div>
                 <span className="font-medium">Emotional Intensity:</span>{' '}
-                {Math.max(sentiment_intensity.positive, sentiment_intensity.neutral, sentiment_intensity.negative).toFixed(2)}
+                {Math.max(analysis.sentiment_intensity.positive, analysis.sentiment_intensity.neutral, analysis.sentiment_intensity.negative).toFixed(2)}
               </div>
               <div>
                 <span className="font-medium">Fetched Comments:</span>{' '}
-                {typeof analysis.total_comment_count === 'number' && total_comments
-                  ? `${total_comments}/${analysis.total_comment_count}`
-                  : total_comments}
+                {typeof analysis.total_comment_count === 'number' && analysis.total_comments
+                  ? `${analysis.total_comments}/${analysis.total_comment_count}`
+                  : analysis.total_comments}
               </div>
               <div>
                 <span className="font-medium">Top Comment:</span>{' '}
-                <span className="italic">{unique_comment}</span>
+                <span className="italic">{analysis.unique_comment}</span>
               </div>
             </div>
           </CardContent>
@@ -106,16 +243,16 @@ export default function SentimentDashboard({ analysis, platform }) {
         <Card>
           <CardHeader>
             <CardTitle>Emotion Distribution</CardTitle>
-            <select value={chartType} onChange={e => setChartType(e.target.value)} className="ml-auto rounded border px-2 py-1 text-sm">
+            <select value={chartTypeOverall} onChange={e => setChartTypeOverall(e.target.value)} className="ml-auto rounded border px-2 py-1 text-sm">
               <option value="radar">Radar</option>
               <option value="pie">Pie</option>
             </select>
           </CardHeader>
           <CardContent>
-            {chartType === 'radar' ? (
-              <RadarChart data={emotion_distribution} color="#2563eb" />
+            {chartTypeOverall === 'radar' ? (
+              <RadarChart data={analysis.emotion_distribution} color="#2563eb" />
             ) : (
-              <PieChart data={emotion_distribution} />
+              <PieChart data={analysis.emotion_distribution} />
             )}
           </CardContent>
         </Card>
@@ -128,17 +265,17 @@ export default function SentimentDashboard({ analysis, platform }) {
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-4">
-              <Progress value={model_confidence.value * 100} className="flex-1 h-3 bg-blue-100 dark:bg-blue-900" style={{ backgroundImage: 'linear-gradient(to right, #3B82F6, #60A5FA)' }} />
-              <Badge className={confidenceColor(model_confidence.label, isDark)}>
-                {model_confidence.label.charAt(0).toUpperCase() + model_confidence.label.slice(1)}
+              <Progress value={analysis.model_confidence.value * 100} className="flex-1 h-3 bg-blue-100 dark:bg-blue-900" style={{ backgroundImage: 'linear-gradient(to right, #3B82F6, #60A5FA)' }} />
+              <Badge className={confidenceColor(analysis.model_confidence.label, isDark)}>
+                {analysis.model_confidence.label.charAt(0).toUpperCase() + analysis.model_confidence.label.slice(1)}
               </Badge>
-              <span className="ml-2 text-sm">{(model_confidence.value * 100).toFixed(1)}%</span>
+              <span className="ml-2 text-sm">{(analysis.model_confidence.value * 100).toFixed(1)}%</span>
             </div>
           </CardContent>
         </Card>
       </div>
       {/* Word Cloud */}
-      {wordcloud && <div className="mt-6"><SentimentWordCloud frequencies={wordcloud} /></div>}
+      {analysis.wordcloud && <div className="mt-6"><SentimentWordCloud frequencies={analysis.wordcloud} /></div>}
     </div>
   );
 } 
