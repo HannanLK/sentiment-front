@@ -1,14 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import LinkInput from '@/components/LinkInput';
 import WelcomeMessage from '@/components/WelcomeMessage';
 import SentimentDashboard from '@/components/SentimentDashboard';
-import { Skeleton } from '@/components/ui/skeleton';
+import AnimatedLoader from '@/components/ui/AnimatedLoader';
+import { useToast } from '@/components/ui/use-toast';
 
 function SocialSentiment() {
   const [embedData, setEmbedData] = useState(null); // { html, error, platform, link }
   const [analysis, setAnalysis] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const dashboardRef = useRef(null);
+  const { toast } = useToast();
 
   // Called by LinkInput when a valid embed is fetched or cleared
   const handleEmbedChange = (embed) => {
@@ -23,7 +26,6 @@ function SocialSentiment() {
     setLoading(true);
     setAnalysis(null);
     setError(null);
-    // Show skeletons for 2s
     setTimeout(async () => {
       try {
         let apiUrl = '';
@@ -43,15 +45,18 @@ function SocialSentiment() {
         try {
           data = await res.json();
         } catch (jsonErr) {
-          // If not JSON, fallback to text
           data = { error: await res.text() };
         }
         if (!res.ok) {
-          // Try to extract error message from backend
           const backendError = data?.detail || data?.error || 'Failed to analyze.';
           setError(backendError);
         } else if (data.error) {
-          setError(data.error);
+          if (data.error.toLowerCase().includes('random sample')) {
+            toast({ title: 'Info', description: data.error, variant: 'info' });
+            setAnalysis(data);
+          } else {
+            setError(data.error);
+          }
         } else {
           setAnalysis(data);
         }
@@ -60,8 +65,15 @@ function SocialSentiment() {
       } finally {
         setLoading(false);
       }
-    }, 2000);
+    }, 1000);
   };
+
+  // Scroll to loader or dashboard when loading or analysis is set
+  useEffect(() => {
+    if ((loading || analysis) && dashboardRef.current) {
+      dashboardRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }, [loading, analysis]);
 
   return (
     <div className="container mx-auto p-4 sm:p-6">
@@ -73,15 +85,17 @@ function SocialSentiment() {
         </div>
 
         {/* Content Area */}
-        {!embedData || embedData.error ? (
-          <WelcomeMessage />
-        ) : loading ? (
-          <Skeleton className="h-[400px] w-full rounded-xl" />
-        ) : error ? (
-          <div className="text-red-500 text-lg font-semibold p-6">{error}</div>
-        ) : analysis ? (
-          <SentimentDashboard analysis={analysis} platform={embedData.platform} />
-        ) : null}
+        <div ref={dashboardRef}>
+          {!embedData || embedData.error ? (
+            <WelcomeMessage />
+          ) : loading ? (
+            <AnimatedLoader />
+          ) : error ? (
+            <div className="text-red-500 text-lg font-semibold p-6">{error}</div>
+          ) : analysis ? (
+            <SentimentDashboard analysis={analysis} platform={embedData.platform} />
+          ) : null}
+        </div>
       </div>
     </div>
   );
