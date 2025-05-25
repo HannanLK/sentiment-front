@@ -271,8 +271,8 @@ export default function TextSentiment() {
   return (
     <div className="min-h-screen flex flex-col">
       <div className="container mx-auto p-4 sm:p-6 flex-1 flex flex-col">
-        <div className="max-w-4xl mx-auto space-y-6 flex-1 flex flex-col">
-          <Card>
+        <div className="w-full max-w-4xl mx-auto space-y-6 flex-1 flex flex-col">
+          <Card className="mx-auto max-w-4xl w-full">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Sparkles className="h-5 w-5" />
@@ -347,8 +347,8 @@ export default function TextSentiment() {
           {!analysis && !loading && <WelcomeMessage />}
 
           {loading ? (
-            <div className="space-y-4">
-              <Card>
+            <div className="w-full space-y-4">
+              <Card className="w-full">
                 <CardContent className="pt-6">
                   <div className="space-y-4">
                     <div className="h-4 bg-gray-200 rounded animate-pulse" />
