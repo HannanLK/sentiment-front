@@ -2,6 +2,9 @@
 
 > Wanna check the vibe? VibeCheck is a lightweight sentiment analysis frontend built to analyze text and social media content with a sleek UI and real-time insights. It's designed to work with the FastAPI-powered backend for delivering fast, interactive emotional analytics.
 
+Click here to view the demo video:
+➡️ https://youtu.be/bue433dk7iA
+
 ---
 
 ## 📄 Table of Contents
@@ -10,12 +13,11 @@
 - [Pre-requisites](#pre-requisites)
 - [Installation](#installation)
 - [Folder Structure](#folder-structure)
-- [Screenshots](#screenshots)
-
 ---
 
 ## ✨ Features
 - Text Sentiment Classification
+- Text Generation
 - Social Media Post & Comment Sentiment Analysis
 - Platform Previews for YouTube, Twitter, Reddit
 - Visualizations: Pie Charts, Word Clouds, Radar Charts
@@ -78,12 +80,4 @@ sentiment-front/
 ├── package.json          # Project dependencies
 └── ...
 ```
-
----
-
-## 🖼️ Screenshots
-> _Coming soon!_
-
----
-
 > Crafted with care. For questions or contributions, feel free to open an issue or PR!
