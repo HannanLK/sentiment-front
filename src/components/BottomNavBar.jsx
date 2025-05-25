@@ -7,40 +7,24 @@ export default function BottomNavBar() {
 
   return (
     <>
-      {/* Desktop Bottom Bar (not fixed) */}
+      {/* Footer (now above nav for mobile visibility) */}
       <footer
-        className="hidden sm:flex w-full items-center justify-between px-4 py-2 bg-black text-gray-200 text-sm"
-        style={{ minHeight: 40, borderTop: '1px solid #222' }}
+        className="w-full px-4 py-2 text-sm border-t border-gray-200 dark:border-gray-800
+                   flex justify-between items-center
+                   mb-15
+                   bg-transparent text-gray-800 dark:text-gray-100
+                   sm:bg-black sm:text-gray-200 sm:mb-0"
+        style={{ minHeight: 40 }}
       >
-        <div className="flex items-center gap-2">
-          <span className="font-light">By Hannan Munas | 2025</span>
-        </div>
-        <div className="flex items-center gap-4">
-          <a
-            href="https://www.linkedin.com/in/hannanlk"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="LinkedIn"
-            className="hover:text-white transition-colors"
-          >
+        <span className="font-light">By Hannan Munas | 2025</span>
+        <div className="flex gap-4">
+          <a href="https://www.linkedin.com/in/hannanlk" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
             <FaLinkedin size={20} />
           </a>
-          <a
-            href="https://x.com/HannanMunas"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Twitter"
-            className="hover:text-white transition-colors"
-          >
+          <a href="https://x.com/HannanMunas" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
             <FaTwitter size={20} />
           </a>
-          <a
-            href="https://www.instagram.com/Hannan.lk/"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Instagram"
-            className="hover:text-white transition-colors"
-          >
+          <a href="https://www.instagram.com/Hannan.lk/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
             <FaInstagram size={20} />
           </a>
         </div>

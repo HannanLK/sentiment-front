@@ -137,7 +137,7 @@ function SocialSentiment() {
   return (
     <div className="min-h-screen flex flex-col">
       <div className="container mx-auto p-4 sm:p-6 flex-1 flex flex-col">
-        <div className="w-full max-w-4xl mx-auto space-y-6 flex-1 flex flex-col">
+        <div className="w-full max-w-4xl mx-auto space-y-6 flex-1 flex flex-col pb-20">
           {/* Link Input Card */}
           <div className="w-full bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
             <h3 className="text-xl font-semibold mb-4 dark:text-gray-200">What's the vibe? Enter a link to analyze…</h3>

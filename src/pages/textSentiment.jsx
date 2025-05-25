@@ -271,7 +271,7 @@ export default function TextSentiment() {
   return (
     <div className="min-h-screen flex flex-col">
       <div className="container mx-auto p-4 sm:p-6 flex-1 flex flex-col">
-        <div className="w-full max-w-4xl mx-auto space-y-6 flex-1 flex flex-col">
+        <div className="w-full max-w-4xl mx-auto space-y-6 flex-1 flex flex-col pb-20">
           <Card className="mx-auto max-w-4xl w-full">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
