@@ -137,21 +137,23 @@ function SocialSentiment() {
   return (
     <div className="min-h-screen flex flex-col">
       <div className="container mx-auto p-4 sm:p-6 flex-1 flex flex-col">
-        <div className="max-w-4xl mx-auto space-y-6 flex-1 flex flex-col">
+        <div className="w-full max-w-4xl mx-auto space-y-6 flex-1 flex flex-col">
           {/* Link Input Card */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 w-full">
+          <div className="w-full bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
             <h3 className="text-xl font-semibold mb-4 dark:text-gray-200">What's the vibe? Enter a link to analyze…</h3>
             <LinkInput onEmbedChange={handleEmbedChange} onAnalyze={handleAnalyze} />
           </div>
 
           {/* Content Area */}
-          <div ref={dashboardRef} className="w-full">
+          <div ref={dashboardRef} className="w-full max-w-4xl mx-auto space-y-6">
             {/* Only show WelcomeMessage or embed preview after link entry, not loader/analysis */}
             {!embedData || embedData.error ? (
               <WelcomeMessage />
             ) : loading || (!showDashboard && !error && !analysis) ? (
               loading ? (
-                <AnimatedLoader ready={apiReady} onDone={handleLoaderDone} minWait={5000} />
+                <div className="w-full">
+                  <AnimatedLoader ready={apiReady} onDone={handleLoaderDone} minWait={5000} />
+                </div>
               ) : null
             ) : error ? (
               <div className="text-red-500 text-lg font-semibold p-6">{error}</div>
