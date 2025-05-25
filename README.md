@@ -1,138 +1,89 @@
-# Sentiment Analysis Frontend
+# VibeCheck | Frontend for the Sentiment Analysis Tool
 
-A modern React-based frontend for text and social media sentiment analysis, built with Vite and styled using Tailwind CSS.
+> Wanna check the vibe? VibeCheck is a lightweight sentiment analysis frontend built to analyze text and social media content with a sleek UI and real-time insights. It's designed to work with the FastAPI-powered backend for delivering fast, interactive emotional analytics.
 
-## Features
+---
 
-- Text Sentiment Analysis
-  - Real-time sentiment scoring
-  - Emotion detection visualization
-  - Key phrase extraction
-  - Text style enhancement
-- Social Media Analysis
-  - Platform-specific sentiment tracking
-  - Engagement analytics
-  - Trend visualization
-  - Cross-platform comparison
-  - Platform-specific sentiment tracking
-  - YouTube dashboard with integrated key insights and model confidence
-  - Improved dark/light mode label visibility
-  - Analysis persists across navigation
-  - Trend visualization
-  - Cross-platform comparison
-- Modern UI/UX
-  - Dark/Light mode support
-  - Responsive design
-  - Interactive visualizations
-  - Real-time feedback
+## 📄 Table of Contents
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Pre-requisites](#pre-requisites)
+- [Installation](#installation)
+- [Folder Structure](#folder-structure)
+- [Screenshots](#screenshots)
 
-## Prerequisites
+---
 
-- Node.js 16+
+## ✨ Features
+- Text Sentiment Classification
+- Social Media Post & Comment Sentiment Analysis
+- Platform Previews for YouTube, Twitter, Reddit
+- Visualizations: Pie Charts, Word Clouds, Radar Charts
+
+---
+
+## 🚀 Tech Stack
+
+<span><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" width="24"/> React</span> &nbsp; 
+<span><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vite/vite-original.svg" width="24"/> Vite</span> &nbsp; 
+<span><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-plain.svg" width="24"/> Tailwind CSS v4</span> &nbsp; 
+<img src="https://api.iconify.design/simple-icons:shadcnui.svg" width="24"/> Shadcn UI  
+
+- **Charts:** Recharts, `@isoterik/react-word-cloud`
+- **Routing:** `react-router-dom`
+- **State/UI:** Radix UI, Lucide React Icons, React Icons
+- **HTTP Requests:** Axios
+- **UX Enhancements:** tippy.js (tooltips), sonner (notifications)
+
+---
+
+## 📦 Models & Back Integration
+- Text Classification: `cardiffnlp/twitter-roberta-base-sentiment-latest`
+- Text Generation: `google/flan-t5-small`
+- Emotion Detection: `j-hartmann/emotion-english-distilroberta-base`
+
+---
+
+## ⚙️ Pre-requisites
+- Node.js 18+
 - npm or yarn
-- Modern web browser
+- Git
 
-## Installation
+---
 
-1. Clone the repository and navigate to the frontend directory:
+## 💻 Installation
 ```bash
+git clone https://github.com/your-user/sentiment-front.git
 cd sentiment-front
-```
-
-2. Install dependencies:
-```bash
 npm install
-# or
-yarn install
-```
-
-## Development
-
-1. Start the development server:
-```bash
 npm run dev
-# or
-yarn dev
 ```
 
-The application will be available at `http://localhost:5173`
+---
 
-## Building for Production
-
-1. Create a production build:
-```bash
-npm run build
-# or
-yarn build
-```
-
-2. Preview the production build:
-```bash
-npm run preview
-# or
-yarn preview
-```
-
-## Project Structure
-
+## 📁 Folder Structure
 ```
 sentiment-front/
 ├── src/
-│   ├── components/         # Reusable UI components
-│   │   ├── ui/            # Base UI components
-│   │   └── charts/        # Visualization components
-│   ├── pages/             # Page components
-│   ├── lib/               # Utility functions
-│   ├── assets/            # Static assets
-│   └── App.jsx           # Main application component
-├── public/                # Public assets
-├── index.html            # Entry HTML file
-└── package.json          # Project dependencies
+│   ├── components/
+│   │   ├── ui/           # Base UI components
+│   │   └── ...           
+│   ├── pages/            # Main page components
+│   ├── context/          # Context providers
+│   ├── lib/              # Utility functions
+│   ├── assets/           # Static assets
+│   └── App.jsx           # Main app
+├── public/               # Public assets
+├── index.html            # Entry HTML
+├── package.json          # Project dependencies
+└── ...
 ```
 
-## Key Components
+---
 
-### Text Analysis
-- Text input with real-time validation
-- Sentiment score visualization
-- Emotion distribution charts
-- Key phrase extraction
-- Text style enhancement options
+## 🖼️ Screenshots
+> _Coming soon!_
 
-### Social Media Analysis
-- Platform selection
-- Trend visualization
-- Engagement metrics
-- Cross-platform comparison
+---
 
-## Styling
-
-The project uses:
-- Tailwind CSS for utility-first styling
-- Shadcn/ui for component library
-- Custom theme support with dark/light mode
-
-## Development Guidelines
-
-### Code Style
-- Follow ESLint configuration
-- Use functional components with hooks
-- Implement proper error handling
-- Write meaningful component documentation
-
-### Performance
-- Implement lazy loading for routes
-- Optimize bundle size
-- Use proper caching strategies
-- Implement proper error boundaries
-
-## Environment Variables
-
-Create a `.env` file in the root directory:
-```env
-VITE_API_URL=http://localhost:8000
-```
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
+> Crafted with care. For questions or contributions, feel free to open an issue or PR!
