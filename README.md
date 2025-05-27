@@ -6,7 +6,6 @@ Click here to view the demo video:
 ➡️ https://youtu.be/bue433dk7iA
 
 ---
-
 ## 📄 Table of Contents
 - [Features](#features)
 - [Tech Stack](#tech-stack)
